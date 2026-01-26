@@ -164,6 +164,7 @@ func (b *Blog) parsePost(filename, content string) (*Post, error) {
 		Title:       title,
 		Date:        date,
 		Content:     markdownContent,
+		// Note: Converting to template.HTML assumes trusted markdown sources (blog owner controls content)
 		HTMLContent: template.HTML(buf.String()),
 		Slug:        slug,
 	}, nil
