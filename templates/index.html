@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - My Blog</title>
+    <link rel="stylesheet" href="https://unpkg.com/feather-css@1.0.2/feather.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <h1><a href="/">My Blog</a></h1>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/search">Search</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <form action="/search" method="get" class="search-form">
+                <input type="text" name="q" placeholder="Search posts..." class="search-input">
+                <button type="submit" class="btn">Search</button>
+            </form>
+        </div>
+
+        <div class="posts-grid">
+            {{if .Posts}}
+                {{range .Posts}}
+                <article class="post-card">
+                    <h2><a href="/post/{{.Slug}}">{{.Title}}</a></h2>
+                    <time datetime="{{.Date.Format "2006-01-02"}}">{{.Date.Format "January 2, 2006"}}</time>
+                </article>
+                {{end}}
+            {{else}}
+                <p>No posts yet. Check back soon!</p>
+            {{end}}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 My Blog. Built with Go and FeatherCSS.</p>
+        </div>
+    </footer>
+</body>
+</html>
