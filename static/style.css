@@ -10,6 +10,69 @@
     --container-width: 720px;
 }
 
+[data-theme="light"] {
+    --background: #ffffff;
+    --surface: #f8f8f8;
+    --surface-hover: #f0f0f0;
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --border: #e0e0e0;
+    --accent: #111111;
+    --code-bg: #f5f5f5;
+    --code-text: #e01e5a;
+}
+
+:root {
+    --code-bg: #272822;
+    --code-text: #f8f8f2;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--surface);
+    border-color: var(--text-secondary);
+}
+
+.theme-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sun-icon {
+    display: none;
+}
+
+.moon-icon {
+    display: block;
+}
+
+[data-theme="light"] .sun-icon {
+    display: block;
+}
+
+[data-theme="light"] .moon-icon {
+    display: none;
+}
+
+
 * {
     margin: 0;
     padding: 0;
@@ -280,7 +343,8 @@ main {
 .post-body {
     font-size: 1.1rem;
     line-height: 1.7;
-    color: #e2e2e2;
+    color: var(--text-primary);
+    opacity: 0.9;
 }
 
 .post-body h2 {
@@ -309,16 +373,15 @@ main {
 
 .post-body code {
     background: var(--surface);
+    color: var(--code-text);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 0.85em;
-    color: #f8f8f2;
 }
 
 .post-body pre {
-    background: #272822 !important;
-    /* Monokai background */
+    background: var(--code-bg) !important;
     padding: 24px;
     border-radius: 12px;
     overflow-x: auto;

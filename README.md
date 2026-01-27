@@ -14,6 +14,7 @@ A minimal, fast Go blog with dark mode and full-text search.
 - 🔍 **Full-text & Tag search** - Intelligent search that filters by exact tag match or full-text keywords
 - 💡 **Search Suggestions** - Real-time suggestions as you type, based on titles and tags
 - 📐 **Math Support** - Render complex mathematical formulas using KaTeX
+- 🌓 **Theme Switching** - Toggle between sophisticated dark and clean light modes
 - ⚡ **Server-side rendering** - Minimal JavaScript, fast page loads
 - 🚀 **Heroku-ready** - Easy deployment with included Procfile
 - 🔄 **Auto-deploy** - GitHub Actions workflow for CI/CD
