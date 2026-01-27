@@ -30,12 +30,13 @@ var templatesFS embed.FS
 var staticFS embed.FS
 
 type Post struct {
-	ID       string
-	Title    string
-	Date     time.Time
-	Content  string
+	ID          string
+	Title       string
+	Date        time.Time
+	Tags        []string
+	Content     string
 	HTMLContent template.HTML
-	Slug     string
+	Slug        string
 }
 
 type SearchCache struct {
@@ -142,6 +143,7 @@ func (b *Blog) parsePost(filename, content string) (*Post, error) {
 	// Parse frontmatter
 	var title string
 	var date time.Time
+	var tags []string
 	for _, line := range strings.Split(frontmatter, "\n") {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "title:") {
@@ -153,6 +155,12 @@ func (b *Blog) parsePost(filename, content string) (*Post, error) {
 			if err != nil {
 				log.Printf("Error parsing date: %v", err)
 				date = time.Now()
+			}
+		} else if strings.HasPrefix(line, "tags:") {
+			tagsStr := strings.TrimSpace(strings.TrimPrefix(line, "tags:"))
+			tagList := strings.Split(tagsStr, ",")
+			for _, t := range tagList {
+				tags = append(tags, strings.TrimSpace(t))
 			}
 		}
 	}
@@ -169,6 +177,7 @@ func (b *Blog) parsePost(filename, content string) (*Post, error) {
 		ID:          slug,
 		Title:       title,
 		Date:        date,
+		Tags:        tags,
 		Content:     markdownContent,
 		// Note: Converting to template.HTML assumes trusted markdown sources (blog owner controls content)
 		HTMLContent: template.HTML(buf.String()),
@@ -224,6 +233,26 @@ func (b *Blog) search(query string) []*Post {
 		return b.getPostsByIDs(cachedIDs)
 	}
 	b.searchCache.mu.RUnlock()
+
+	// Check if the query is an exact tag match
+	trimmedQuery := strings.TrimSpace(query)
+	var tagMatches []*Post
+	for _, post := range b.posts {
+		for _, tag := range post.Tags {
+			if strings.EqualFold(tag, trimmedQuery) {
+				tagMatches = append(tagMatches, post)
+				break
+			}
+		}
+	}
+
+	if len(tagMatches) > 0 {
+		// Sort by date (newest first)
+		sort.Slice(tagMatches, func(i, j int) bool {
+			return tagMatches[i].Date.After(tagMatches[j].Date)
+		})
+		return tagMatches
+	}
 
 	// Tokenize search query
 	words := tokenize(query)

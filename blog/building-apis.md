@@ -1,6 +1,7 @@
 ---
 title: Building RESTful APIs in Go
 date: 2024-01-25
+tags: go, api, tutorial
 ---
 
 # Building RESTful APIs in Go

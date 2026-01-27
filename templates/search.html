@@ -43,6 +43,13 @@
             <article class="post-card">
                 <time datetime="{{.Date.Format " 2006-01-02"}}">{{.Date.Format "January 2, 2006"}}</time>
                 <h3><a href="/post/{{.Slug}}">{{.Title}}</a></h3>
+                {{if .Tags}}
+                <div class="post-tags">
+                    {{range .Tags}}
+                    <a href="/search?q={{.}}" class="tag">{{.}}</a>
+                    {{end}}
+                </div>
+                {{end}}
             </article>
             {{end}}
         </div>

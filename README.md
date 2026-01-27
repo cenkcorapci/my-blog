@@ -9,8 +9,9 @@ A minimal, fast Go blog with dark mode and full-text search.
 ## Features
 
 - 🌙 **Sophisticated Minimalist Style** - Beautiful dark theme with Inter typography
+- 🏷️ **Tags Support** - Display tags on post listings for better categorization
 - 📝 **Markdown support** - Write posts in Markdown, rendered with goldmark
-- 🔍 **Full-text search** - Fast inverted index search with caching
+- 🔍 **Full-text & Tag search** - Intelligent search that filters by exact tag match or full-text keywords
 - ⚡ **Server-side rendering** - Minimal JavaScript, fast page loads
 - 🚀 **Heroku-ready** - Easy deployment with included Procfile
 - 🔄 **Auto-deploy** - GitHub Actions workflow for CI/CD
@@ -42,6 +43,7 @@ The following metadata fields are supported:
 
 - `title`: The display name of your blog post (appears in search results and post list).
 - `date`: The publication date in `YYYY-MM-DD` format (used for reverse-chronological sorting).
+- `tags`: A comma-separated list of tags (e.g., `go, backend, tutorial`).
 
 Example:
 
@@ -49,6 +51,7 @@ Example:
 ---
 title: Building Minimal APIs in Go
 date: 2024-01-26
+tags: go, web-dev
 ---
 
 # Your Content Starts Here

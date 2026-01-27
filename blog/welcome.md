@@ -1,6 +1,7 @@
 ---
 title: Welcome to Cenk Corapci
 date: 2024-01-15
+tags: general, introduction
 ---
 
 # Welcome to Cenk Corapci
