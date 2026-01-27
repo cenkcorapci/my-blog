@@ -62,6 +62,18 @@ tags: go, web-dev
 
 > **Note**: These fields are strictly required for the post to be rendered and sorted correctly.
 
+## Configuration
+
+You can customize the blog name and introduction by editing `config.yaml`:
+
+```yaml
+blog_name: "Cenk Corapci"
+introduction: "I'm Cenk, a data engineer based in Netherlands."
+```
+
+- `blog_name`: Changes the title across all pages and the navigation brand.
+- `introduction`: Updates the "About Me" section on the home page.
+
 ### Supported Markdown Tags
 
 Your blog supports **GitHub Flavored Markdown (GFM)** and **Monokai Syntax Highlighting**. You can use:

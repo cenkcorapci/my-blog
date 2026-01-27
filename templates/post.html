@@ -15,7 +15,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}} - Cenk Corapci</title>
+    <title>{{.Title}} - {{.Config.BlogName}}</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +37,7 @@
     <header>
         <div class="container">
             <nav>
-                <h1><a href="/">Cenk Corapci</a></h1>
+                <h1><a href="/">{{.Config.BlogName}}</a></h1>
                 <ul class="nav-links">
                     <li><a href="/">Home</a></li>
                     <li><a href="/search">Search</a></li>

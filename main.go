@@ -23,6 +23,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	mathjax "github.com/litao91/goldmark-mathjax"
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed templates/*.html
@@ -39,6 +40,11 @@ type Post struct {
 	Content     string
 	HTMLContent template.HTML
 	Slug        string
+}
+
+type Config struct {
+	BlogName     string `yaml:"blog_name"`
+	Introduction string `yaml:"introduction"`
 }
 
 type SearchCache struct {
@@ -58,6 +64,7 @@ type Blog struct {
 	markdown      goldmark.Markdown
 	searchCache   *SearchCache
 	invertedIndex *InvertedIndex
+	Config        Config
 }
 
 func NewBlog() *Blog {
@@ -90,7 +97,29 @@ func NewBlog() *Blog {
 		markdown:      md,
 		searchCache:   &SearchCache{results: make(map[string][]string)},
 		invertedIndex: &InvertedIndex{index: make(map[string][]string)},
+		Config:        loadConfig(),
 	}
+}
+
+func loadConfig() Config {
+	file, err := os.ReadFile("config.yaml")
+	if err != nil {
+		log.Printf("Warning: Could not read config.yaml, using defaults: %v", err)
+		return Config{
+			BlogName:     "Cenk Corapci",
+			Introduction: "I'm Cenk, a data engineer based in Netherlands.",
+		}
+	}
+
+	var config Config
+	if err := yaml.Unmarshal(file, &config); err != nil {
+		log.Printf("Warning: Could not parse config.yaml, using defaults: %v", err)
+		return Config{
+			BlogName:     "Cenk Corapci",
+			Introduction: "I'm Cenk, a data engineer based in Netherlands.",
+		}
+	}
+	return config
 }
 
 func (b *Blog) LoadPosts(dir string) error {
@@ -324,8 +353,9 @@ func (b *Blog) handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]interface{}{
-		"Title": "Home",
-		"Posts": b.postList,
+		"Title":  "Home",
+		"Posts":  b.postList,
+		"Config": b.Config,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -349,8 +379,9 @@ func (b *Blog) handlePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := map[string]interface{}{
-		"Title": post.Title,
-		"Post":  post,
+		"Title":  post.Title,
+		"Post":   post,
+		"Config": b.Config,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -365,9 +396,10 @@ func (b *Blog) handleSearch(w http.ResponseWriter, r *http.Request) {
 	posts := b.search(query)
 
 	data := map[string]interface{}{
-		"Title": "Search Results",
-		"Query": query,
-		"Posts": posts,
+		"Title":  "Search Results",
+		"Query":  query,
+		"Posts":  posts,
+		"Config": b.Config,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
