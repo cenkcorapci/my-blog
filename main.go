@@ -470,7 +470,7 @@ func (b *Blog) exportStatic(distDir string) {
 
 	// Export Posts
 	os.MkdirAll(filepath.Join(distDir, "post"), 0755)
-	for slug, post := range b.posts {
+	for slug := range b.posts {
 		os.MkdirAll(filepath.Join(distDir, "post", slug), 0755)
 		postFile, _ := os.Create(filepath.Join(distDir, "post", slug, "index.html"))
 		b.handlePost(StaticResponseWriter{postFile}, &http.Request{URL: &url.URL{Path: "/post/" + slug}})
