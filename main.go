@@ -20,6 +20,7 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
 )
 
 //go:embed templates/*.html
@@ -58,7 +59,12 @@ type Blog struct {
 
 func NewBlog() *Blog {
 	md := goldmark.New(
-		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(
+			extension.GFM,
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("monokai"),
+			),
+		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 		),

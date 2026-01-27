@@ -1,10 +1,10 @@
-# my-blog
+# Cenk Corapci
 
 A minimal, fast Go blog with dark mode and full-text search.
 
 ## Features
 
-- 🌙 **Dark mode by default** - Beautiful dark theme using FeatherCSS
+- 🌙 **Sophisticated Minimalist Style** - Beautiful dark theme with Inter typography
 - 📝 **Markdown support** - Write posts in Markdown, rendered with goldmark
 - 🔍 **Full-text search** - Fast inverted index search with caching
 - ⚡ **Server-side rendering** - Minimal JavaScript, fast page loads
@@ -79,7 +79,7 @@ git push heroku main
 
 - **Backend**: Go (standard library)
 - **Markdown**: goldmark with GFM extensions
-- **Styling**: FeatherCSS + custom dark mode CSS
+- **Styling**: Sophisticated Minimalist CSS (no dependencies)
 - **Deployment**: Heroku with GitHub Actions
 
 ## Project Structure

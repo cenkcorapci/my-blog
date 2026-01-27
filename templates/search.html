@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html data-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}} - My Blog</title>
-    <link rel="stylesheet" href="https://unpkg.com/feather-css@1.0.2/feather.min.css">
+    <title>{{.Title}} - Cenk Corapci</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header>
         <div class="container">
             <nav>
-                <h1><a href="/">My Blog</a></h1>
-                <ul>
+                <h1><a href="/">Cenk Corapci</a></h1>
+                <ul class="nav-links">
                     <li><a href="/">Home</a></li>
                     <li><a href="/search">Search</a></li>
+                    <li><a href="https://github.com/cenkcorapci" target="_blank">GitHub</a></li>
+                    <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
                 </ul>
             </nav>
         </div>
@@ -29,33 +35,28 @@
         </div>
 
         {{if .Query}}
-            <h2>Search Results for "{{.Query}}"</h2>
-            
-            {{if .Posts}}
-                <div class="posts-grid">
-                    {{range .Posts}}
-                    <article class="post-card">
-                        <h3><a href="/post/{{.Slug}}">{{.Title}}</a></h3>
-                        <time datetime="{{.Date.Format "2006-01-02"}}">{{.Date.Format "January 2, 2006"}}</time>
-                    </article>
-                    {{end}}
-                </div>
-            {{else}}
-                <p>No posts found matching your search.</p>
+        <h2>Search Results for "{{.Query}}"</h2>
+
+        {{if .Posts}}
+        <div class="posts-grid">
+            {{range .Posts}}
+            <article class="post-card">
+                <time datetime="{{.Date.Format " 2006-01-02"}}">{{.Date.Format "January 2, 2006"}}</time>
+                <h3><a href="/post/{{.Slug}}">{{.Title}}</a></h3>
+            </article>
             {{end}}
+        </div>
         {{else}}
-            <p>Enter a search query above to find posts.</p>
+        <p>No posts found matching your search.</p>
+        {{end}}
+        {{else}}
+        <p>Enter a search query above to find posts.</p>
         {{end}}
 
-        <div class="post-nav">
-            <a href="/" class="btn">← Back to Home</a>
-        </div>
+
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 My Blog. Built with Go and FeatherCSS.</p>
-        </div>
-    </footer>
+
 </body>
+
 </html>

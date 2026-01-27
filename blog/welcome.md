@@ -1,9 +1,9 @@
 ---
-title: Welcome to My Blog
+title: Welcome to Cenk Corapci
 date: 2024-01-15
 ---
 
-# Welcome to My Blog
+# Welcome to Cenk Corapci
 
 This is my first blog post! I'm excited to share my thoughts and ideas with you.
 
