@@ -1,5 +1,9 @@
 # Cenk Corapci
 
+![CI Status](https://github.com/cenkcorapci/my-blog/actions/workflows/ci.yml/badge.svg)
+![Deployment Status](https://github.com/cenkcorapci/my-blog/actions/workflows/deploy.yml/badge.svg)
+[![codecov](https://codecov.io/gh/cenkcorapci/my-blog/branch/main/graph/badge.svg?token=G9P8UXYR8O)](https://codecov.io/gh/cenkcorapci/my-blog)
+
 A minimal, fast Go blog with dark mode and full-text search.
 
 ## Features
