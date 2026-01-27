@@ -103,8 +103,43 @@ main {
     gap: 12px;
 }
 
-.search-input {
+.search-input-wrapper {
+    position: relative;
     flex: 1;
+}
+
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    z-index: 100;
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.search-input {
+    width: 100%;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;

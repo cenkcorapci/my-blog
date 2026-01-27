@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -21,6 +22,7 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	mathjax "github.com/litao91/goldmark-mathjax"
 )
 
 //go:embed templates/*.html
@@ -65,6 +67,7 @@ func NewBlog() *Blog {
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("monokai"),
 			),
+			mathjax.MathJax,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -374,6 +377,48 @@ func (b *Blog) handleSearch(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (b *Blog) handleSuggestions(w http.ResponseWriter, r *http.Request) {
+	query := strings.TrimSpace(strings.ToLower(r.URL.Query().Get("q")))
+	if query == "" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode([]string{})
+		return
+	}
+
+	suggestionsMap := make(map[string]bool)
+	var suggestions []string
+
+	// Suggest from tags
+	for _, post := range b.posts {
+		for _, tag := range post.Tags {
+			if strings.HasPrefix(strings.ToLower(tag), query) {
+				if !suggestionsMap[tag] {
+					suggestionsMap[tag] = true
+					suggestions = append(suggestions, tag)
+				}
+			}
+		}
+	}
+
+	// Suggest from titles
+	for _, post := range b.posts {
+		if strings.Contains(strings.ToLower(post.Title), query) {
+			if !suggestionsMap[post.Title] {
+				suggestionsMap[post.Title] = true
+				suggestions = append(suggestions, post.Title)
+			}
+		}
+	}
+
+	// Limit suggestions
+	if len(suggestions) > 10 {
+		suggestions = suggestions[:10]
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(suggestions)
+}
+
 func main() {
 	blog := NewBlog()
 
@@ -386,6 +431,7 @@ func main() {
 	http.HandleFunc("/", blog.handleHome)
 	http.HandleFunc("/post/", blog.handlePost)
 	http.HandleFunc("/search", blog.handleSearch)
+	http.HandleFunc("/api/suggestions", blog.handleSuggestions)
 
 	// Serve static files
 	staticContent, err := fs.Sub(staticFS, "static")

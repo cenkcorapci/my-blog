@@ -12,6 +12,8 @@ A minimal, fast Go blog with dark mode and full-text search.
 - 🏷️ **Tags Support** - Display tags on post listings for better categorization
 - 📝 **Markdown support** - Write posts in Markdown, rendered with goldmark
 - 🔍 **Full-text & Tag search** - Intelligent search that filters by exact tag match or full-text keywords
+- 💡 **Search Suggestions** - Real-time suggestions as you type, based on titles and tags
+- 📐 **Math Support** - Render complex mathematical formulas using KaTeX
 - ⚡ **Server-side rendering** - Minimal JavaScript, fast page loads
 - 🚀 **Heroku-ready** - Easy deployment with included Procfile
 - 🔄 **Auto-deploy** - GitHub Actions workflow for CI/CD
@@ -76,6 +78,10 @@ Your blog supports **GitHub Flavored Markdown (GFM)** and **Monokai Syntax Highl
 - **Quotes**: `> This is a blockquote`
 - **Tables**: Standard Markdown tables are supported.
 - **Task Lists**: `- [x] Done` and `- [ ] Todo`
+- **Math Formulas**: LaTeX style math using `$` for inline ($E=mc^2$) and `$$` for block:
+    $$
+    x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+    $$
 
 ## Deployment to Heroku
 
