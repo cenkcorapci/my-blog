@@ -96,6 +96,17 @@ Your blog supports **GitHub Flavored Markdown (GFM)** and **Monokai Syntax Highl
     x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
     $$
 
+## Building and Testing
+
+The project includes a `Makefile` to automate common developer tasks:
+
+- `make all`: Runs tests, builds the binary, and exports the static site.
+- `make build`: Compiles the Go binary.
+- `make test`: Executes unit tests.
+- `make static`: Generates the static version of the blog in the `dist/` folder.
+- `make run`: Starts the blog server locally.
+- `make clean`: Removes the compiled binary and the `dist/` directory.
+
 ## Deployment to Heroku
 
 ### Setup
@@ -117,6 +128,28 @@ heroku create your-app-name
 ```bash
 git push heroku main
 ```
+
+## Deployment to Netlify
+
+This blog supports high-performance static deployment to Netlify.
+
+### Automated Setup (via GitHub Actions)
+
+1. Create a new site on Netlify.
+2. Add the following secrets to your GitHub repository:
+   - `NETLIFY_AUTH_TOKEN`: Your Personal Access Token.
+   - `NETLIFY_SITE_ID`: The API ID of your Netlify site.
+3. Every push to `main` will trigger a custom static export and deploy to Netlify.
+
+### How it Works (Static Export)
+
+Since Netlify is a static hosting platform, the blog includes a custom engine to generate HTML files:
+```bash
+go run main.go -static
+```
+This renders every post and the homepage into a `dist/` folder which is then served globally.
+
+> **Note**: In the Netlify version, the dynamic backend search API and suggestions are replaced by static search pages. For the full dynamic experience with real-time suggestions, Heroku is recommended.
 
 ## Architecture
 

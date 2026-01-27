@@ -1,0 +1,13 @@
+[build]
+  command = "go run main.go -static"
+  publish = "dist"
+
+[[redirects]]
+  from = "/post/*"
+  to = "/post/:splat/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/search"
+  to = "/search/index.html"
+  status = 200

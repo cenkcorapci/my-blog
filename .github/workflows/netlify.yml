@@ -1,0 +1,27 @@
+name: Deploy to Netlify
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                  go-version: "1.21"
+
+            - name: Build Static Site
+              run: go run main.go -static
+
+            - name: Deploy to Netlify
+              uses: netlify/actions/cli@master
+              env:
+                  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+                  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+              with:
+                  args: deploy --dir=dist --prod

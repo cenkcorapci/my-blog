@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -451,12 +453,66 @@ func (b *Blog) handleSuggestions(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(suggestions)
 }
 
+func (b *Blog) exportStatic(distDir string) {
+	os.RemoveAll(distDir)
+	os.MkdirAll(distDir, 0755)
+
+	// Export Home
+	homeFile, _ := os.Create(filepath.Join(distDir, "index.html"))
+	b.handleHome(StaticResponseWriter{homeFile}, &http.Request{URL: &url.URL{Path: "/"}})
+	homeFile.Close()
+
+	// Export Search Page (Initial empty state)
+	os.MkdirAll(filepath.Join(distDir, "search"), 0755)
+	searchFile, _ := os.Create(filepath.Join(distDir, "search", "index.html"))
+	b.handleSearch(StaticResponseWriter{searchFile}, &http.Request{URL: &url.URL{Path: "/search"}})
+	searchFile.Close()
+
+	// Export Posts
+	os.MkdirAll(filepath.Join(distDir, "post"), 0755)
+	for slug, post := range b.posts {
+		os.MkdirAll(filepath.Join(distDir, "post", slug), 0755)
+		postFile, _ := os.Create(filepath.Join(distDir, "post", slug, "index.html"))
+		b.handlePost(StaticResponseWriter{postFile}, &http.Request{URL: &url.URL{Path: "/post/" + slug}})
+		postFile.Close()
+	}
+
+	// Export Static Files
+	os.MkdirAll(filepath.Join(distDir, "static"), 0755)
+	entries, _ := staticFS.ReadDir("static")
+	for _, entry := range entries {
+		data, _ := staticFS.ReadFile("static/" + entry.Name())
+		os.WriteFile(filepath.Join(distDir, "static", entry.Name()), data, 0644)
+	}
+
+	fmt.Printf("Successfully exported static site to ./%s\n", distDir)
+}
+
+type StaticResponseWriter struct {
+	file *os.File
+}
+
+func (s StaticResponseWriter) Header() http.Header         { return make(http.Header) }
+func (s StaticResponseWriter) Write(b []byte) (int, error) { return s.file.Write(b) }
+func (s StaticResponseWriter) WriteHeader(statusCode int)  {}
+
 func main() {
+	// Add flag import at the top of the file if not present
+	// import "flag"
+
+	staticExport := flag.Bool("static", false, "Export the blog as a static site")
+	flag.Parse()
+
 	blog := NewBlog()
 
 	// Load blog posts from /blog directory
 	if err := blog.LoadPosts("blog"); err != nil {
-		log.Fatal("Error loading blog posts:", err)
+		log.Fatal(err)
+	}
+
+	if *staticExport {
+		blog.exportStatic("dist")
+		return
 	}
 
 	// Setup routes
