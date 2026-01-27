@@ -28,22 +28,47 @@ go run main.go
 
 3. Open http://localhost:8080 in your browser
 
-### Adding Blog Posts
+The blog automatically loads all posts from the `blog/` directory on startup.
 
-Create a new `.md` file in the `blog/` directory with frontmatter:
+### Blog Post Structure
+
+Each post must be a `.md` file with a **YAML Frontmatter** section at the top. This section is used by the Go backend to index and sort your posts. 
+
+The following metadata fields are supported:
+
+- `title`: The display name of your blog post (appears in search results and post list).
+- `date`: The publication date in `YYYY-MM-DD` format (used for reverse-chronological sorting).
+
+Example:
 
 ```markdown
 ---
-title: Your Post Title
+title: Building Minimal APIs in Go
 date: 2024-01-26
 ---
 
-# Your Post Title
-
-Your content here...
+# Your Content Starts Here
 ```
 
-The blog automatically loads all posts from the `blog/` directory on startup.
+> **Note**: These fields are strictly required for the post to be rendered and sorted correctly.
+
+### Supported Markdown Tags
+
+Your blog supports **GitHub Flavored Markdown (GFM)** and **Monokai Syntax Highlighting**. You can use:
+
+- **Headings**: `# h1`, `## h2`, `### h3`
+- **Text Styling**: `**bold**`, `*italic*`, `~~strikethrough~~`
+- **Lists**: Bulleted `- item` and numbered `1. item`
+- **Links & Images**: `[link text](url)` and `![alt text](image-url)`
+- **Code Blocks**: With syntax highlighting using triple backticks:
+    ```go
+    func hello() {
+        fmt.Println("Hello, World!")
+    }
+    ```
+- **Quotes**: `> This is a blockquote`
+- **Tables**: Standard Markdown tables are supported.
+- **Task Lists**: `- [x] Done` and `- [ ] Todo`
 
 ## Deployment to Heroku
 
