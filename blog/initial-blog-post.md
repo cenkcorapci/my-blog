@@ -1,7 +1,7 @@
 ---
 title: My Intention with This Blog
 date: 2026-01-28
-tags: general, philosophy
+tags: general
 ---
 
 # My Intention with This Blog
