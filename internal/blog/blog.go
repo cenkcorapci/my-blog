@@ -290,6 +290,10 @@ func (b *Blog) Export(distDir string) {
 		Slug  string   `json:"slug"`
 	}
 	for _, post := range b.postList {
+		tags := post.Tags
+		if tags == nil {
+			tags = []string{}
+		}
 		indexPosts = append(indexPosts, struct {
 			ID    string   `json:"id"`
 			Title string   `json:"title"`
@@ -300,7 +304,7 @@ func (b *Blog) Export(distDir string) {
 			ID:    post.ID,
 			Title: post.Title,
 			Date:  post.Date.Format("2006-01-02"),
-			Tags:  post.Tags,
+			Tags:  tags,
 			Slug:  post.Slug,
 		})
 	}

@@ -2,7 +2,7 @@
  * Client-Side Search Module for Static Site Deployment
  * 
  * This script provides full-text search and tag filtering functionality
- * for the static version of the blog (deployed to Netlify).
+ * for the static version of the blog.
  * 
  * It loads a pre-generated search index (search-index.json) and performs
  * all search operations in the browser.
@@ -22,18 +22,23 @@ class BlogSearch {
         if (this.initialized) return;
 
         try {
+            // Fetch relative to root to ensure it works on subpages
             const response = await fetch('/search-index.json');
             if (!response.ok) {
                 throw new Error('Failed to load search index');
             }
 
             const data = await response.json();
-            this.posts = data.posts || [];
+            // Ensure posts and tags are arrays to prevent iteration errors
+            this.posts = (data.posts || []).map(post => ({
+                ...post,
+                tags: post.tags || []
+            }));
             this.invertedIndex = data.invertedIndex || {};
             this.initialized = true;
+            console.log('Search index loaded successfully');
         } catch (error) {
             console.error('Error loading search index:', error);
-            // Fallback: search will return empty results
             this.posts = [];
             this.invertedIndex = {};
             this.initialized = true;
@@ -44,6 +49,7 @@ class BlogSearch {
      * Tokenize text into searchable words
      */
     tokenize(text) {
+        if (!text) return [];
         return (text.match(/[a-zA-Z0-9]+/g) || []).map(w => w.toLowerCase());
     }
 
@@ -60,7 +66,7 @@ class BlogSearch {
 
         // First, check for exact tag match
         const tagMatches = this.posts.filter(post =>
-            post.tags.some(tag => tag.toLowerCase() === query)
+            (post.tags || []).some(tag => tag.toLowerCase() === query)
         );
 
         if (tagMatches.length > 0) {
@@ -79,8 +85,14 @@ class BlogSearch {
             if (matchingPostIds === null) {
                 matchingPostIds = new Set(postIds);
             } else {
-                // Intersection
-                matchingPostIds = new Set([...matchingPostIds].filter(id => postIds.includes(id)));
+                // Intersection: found both in current set AND word index
+                const intersection = new Set();
+                for (const id of postIds) {
+                    if (matchingPostIds.has(id)) {
+                        intersection.add(id);
+                    }
+                }
+                matchingPostIds = intersection;
             }
 
             if (matchingPostIds.size === 0) break;
@@ -105,23 +117,21 @@ class BlogSearch {
 
         const suggestions = new Set();
 
-        // Suggest from tags
         for (const post of this.posts) {
-            for (const tag of post.tags) {
+            // Suggest from tags
+            const tags = post.tags || [];
+            for (const tag of tags) {
                 if (tag.toLowerCase().startsWith(query)) {
                     suggestions.add(tag);
                 }
             }
-        }
 
-        // Suggest from titles
-        for (const post of this.posts) {
+            // Suggest from titles
             if (post.title.toLowerCase().includes(query)) {
                 suggestions.add(post.title);
             }
         }
 
-        // Limit to 10 suggestions
         return Array.from(suggestions).slice(0, 10);
     }
 
@@ -130,13 +140,6 @@ class BlogSearch {
      */
     sortByDate(posts) {
         return [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
-
-    /**
-     * Get all posts
-     */
-    getAllPosts() {
-        return this.sortByDate(this.posts);
     }
 }
 
@@ -150,8 +153,8 @@ function renderPosts(posts, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    if (posts.length === 0) {
-        container.innerHTML = '<p>No posts found matching your search.</p>';
+    if (!posts || posts.length === 0) {
+        container.innerHTML = '<p class="no-results">No posts found matching your search.</p>';
         return;
     }
 
@@ -164,9 +167,10 @@ function renderPosts(posts, containerId) {
         });
         const isoDate = post.date;
 
-        const tagsHtml = post.tags.length > 0 ? `
+        const tags = post.tags || [];
+        const tagsHtml = tags.length > 0 ? `
             <div class="post-tags">
-                ${post.tags.map(tag => `<a href="/search/?q=${encodeURIComponent(tag)}" class="tag">${tag}</a>`).join('')}
+                ${tags.map(tag => `<a href="/search/?q=${encodeURIComponent(tag)}" class="tag">${tag}</a>`).join('')}
             </div>
         ` : '';
 
@@ -192,9 +196,9 @@ async function initClientSearch() {
     const suggestionsList = document.getElementById('suggestions');
     const searchResultsContainer = document.getElementById('search-results');
 
-    if (!searchInput) return;
+    if (!searchInput || !suggestionsList) return;
 
-    // Handle search on page load (for /search?q=query URLs)
+    // Handle search on page load (for /search/?q=query URLs)
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get('q');
 
@@ -203,10 +207,10 @@ async function initClientSearch() {
         const results = blogSearch.search(initialQuery);
         renderPosts(results, 'search-results');
 
-        // Update the heading
-        const heading = document.querySelector('main h2');
-        if (heading) {
-            heading.textContent = `Search Results for "${initialQuery}"`;
+        // Update the heading if it exists
+        const searchTitle = document.getElementById('search-title');
+        if (searchTitle) {
+            searchTitle.textContent = `Search Results for "${initialQuery}"`;
         }
     }
 
@@ -230,6 +234,7 @@ async function initClientSearch() {
             suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
                 item.addEventListener('click', () => {
                     searchInput.value = item.textContent;
+                    suggestionsList.style.display = 'none';
                     // Navigate to search page with query
                     window.location.href = `/search/?q=${encodeURIComponent(item.textContent)}`;
                 });
@@ -259,10 +264,14 @@ async function initClientSearch() {
     });
 }
 
-// Export for use in templates
+// Export for use in templates and testing
 if (typeof window !== 'undefined') {
     window.BlogSearch = BlogSearch;
     window.blogSearch = blogSearch;
     window.initClientSearch = initClientSearch;
     window.renderPosts = renderPosts;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { BlogSearch, blogSearch };
 }
