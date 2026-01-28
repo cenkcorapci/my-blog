@@ -4,20 +4,18 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e078470a-6aac-40d8-8464-808888ae3d22/deploy-status)](https://app.netlify.com/projects/cenkcorapci/deploys)
 [![codecov](https://codecov.io/gh/cenkcorapci/my-blog/branch/main/graph/badge.svg?token=G9P8UXYR8O)](https://codecov.io/gh/cenkcorapci/my-blog)
 
-A minimal, fast Go blog with dark mode and hybrid search (Static + Netlify Functions).
+A minimal, high-performance static blog generator in Go with zero-latency client-side search.
 
 ## Features
 
 - 🌙 **Sophisticated Minimalist Style** - Beautiful dark theme with Inter typography
-- 🏷️ **Tags Support** - Display tags on post listings for better categorization
+- 🔍 **Full-Text Frontend Search** - Instant search & suggestions without a backend
+- 🏷️ **Tag Filtering** - Clickable tags to explore related content
 - 📝 **Markdown support** - Write posts in Markdown, rendered with goldmark
-- 🔍 **Hybrid Search System** - Intelligence that adapts to your deployment
-- 💡 **Search Suggestions** - Real-time suggestions powered by Netlify Functions
-- 📐 **Math Support** - Render complex mathematical formulas using KaTeX
+- 📐 **Math Support** - Render complex mathematical formulas using KaTeX (MathJax)
 - 🌓 **Theme Switching** - Toggle between sophisticated dark and clean light modes
-- ⚡ **Go-powered Backend** - Fast performance with standard library
-- 🌐 **Static Export** - Optimized for Netlify/JAMstack with zero-latency loads
-- 🔄 **Auto-deploy** - GitHub Actions workflow for CI/CD
+- ⚡ **Zero Backend** - Purely static HTML/JS/CSS, deployable anywhere (Netlify, GitHub Pages, etc.)
+- 🌐 **Netlify Ready** - Optimized for high-performance JAMstack deployment with clean URLs
 
 ## Quick Start
 
@@ -29,92 +27,76 @@ git clone https://github.com/cenkcorapci/my-blog.git
 cd my-blog
 ```
 
-2. Run the blog:
+2. Run the generator and preview server:
 ```bash
 make run
 ```
 
-3. Open http://localhost:8080 in your browser
+3. Open http://localhost:8080 in your browser.
 
-The blog automatically loads all posts from the `blog/` directory on startup.
+The blog generates all content from the `blog/` directory. Any changes to markdown files will be reflected after a re-run/refresh.
 
-### Blog Post Structure
+## Search & Tags
 
-Each post must be a `.md` file with a **YAML Frontmatter** section at the top.
+The search system is powered by a pre-generated `search-index.json`. 
+- **Full-Text Search**: Indexed titles and content.
+- **Tag Search**: Priority matches for specific tags.
+- **Instant Suggestions**: Real-time results as you type.
 
-Example:
-
-```markdown
----
-title: Building Minimal APIs in Go
-date: 2024-01-26
-tags: go, web-dev
----
-
-# Your Content Starts Here
-```
-
-## Hybrid Search Modes
-
-This blog supports two search modes depending on how you build it:
-
-### 1. Static Mode (Frontend Search)
-Run: `make static`
-- **When to use**: Minimal deployments on Netlify without any active server.
-- **How it works**: Generates a `search-index.json` during build. `search.js` performs full-text search directly in the browser.
-- **Benefit**: Zero cost, zero latency, works on any CDN.
-
-### 2. Dynamic Mode (Backend Search)
-Run: `make build` (Deployment uses Netlify Functions)
-- **When to use**: Larger sites or when you want server-side heavy lifting.
-- **How it works**: Search and suggestions are handled by a Netlify Function written in Go.
-- **Benefit**: Extremely fast real-time suggestions, search results don't require downloading an index.
+Everything happens on the client side for maximum speed and offline support.
 
 ## Building and Testing
 
-- `make all`: Runs tests, builds binary/functions, and generates static site.
-- `make build`: Compiles the binary and Netlify functions.
-- `make static`: Generates the static site in the `dist/` folder (Frontend Search).
-- `make run`: Starts the blog server locally (Backend Search).
-- `make test`: Executes unit tests.
+### Build Targets
+
+- `make all`: Runs all tests and generates the static site.
+- `make build`: Compiles the site generator binary (`blog-gen`).
+- `make static`: Generates the static site in the `dist/` folder.
+- `make run`: Starts a local preview server for the generated site.
 - `make clean`: Removes build artifacts.
 
-## Deployment to Netlify
+### Testing
 
-This blog is optimized for Netlify.
+This project includes tests for both the Go generator and the JavaScript search engine.
 
-### 1. Simple Static Deploy
-Set build command to: `go run main.go -static`
-Set publish directory to: `dist`
+**Go Tests:**
+```bash
+make test-go
+```
 
-### 2. Full Hybrid Deploy (Recommended)
-The project includes a `netlify.toml` which is configured to build the Go functions.
-- Every push to `main` will trigger a build of the static pages AND the Netlify Functions.
-- Your search suggestions will be powered by the Go backend in the cloud.
+**JavaScript Tests:** (Requires Node.js)
+```bash
+npm install
+make test-js
+```
+
+## Deployment
+
+Since the site is purely static, you can host it on any provider.
+
+### Netlify (Recommended)
+The project includes a `netlify.toml` which is ready for deployment.
+- **Build Command**: `go run main.go -dist dist`
+- **Publish Directory**: `dist`
+- **Clean URLs**: Automatically handles `/post/slug/` redirects to `/post/slug/index.html`.
 
 ## Architecture
 
-### Search System
-- **Inverted Index**: Maps words to post IDs for fast lookup.
-- **Search Cache**: Caches results for repeated queries.
-- **AND Search**: Returns posts matching all search terms.
-
-### Technology Stack
-- **Backend**: Go (internal package optimized for speed)
-- **Serverless**: Netlify Functions (Go runtime)
-- **Frontend**: Vanilla JS + CSS (minimal footprints)
+- **Generator**: Go (Loads posts, converts Markdown, renders templates)
+- **Search**: Vanilla JS (Consumes a JSON inverted index for instant search)
+- **Style**: Vanilla CSS (Tailored dark/light themes)
 
 ## Project Structure
 
 ```
 .
-├── internal/blog/           # Core blog engine (Shared Logic)
-├── netlify/functions/       # Netlify serverless entry points
+├── internal/blog/           # Static generator logic
 ├── blog/                    # Markdown blog posts
 ├── templates/               # HTML templates
-├── static/                  # Static assets
+├── static/                  # Static assets (JS/CSS)
 ├── main.go                  # CLI entry point
 ├── netlify.toml             # Netlify configuration
+├── package.json             # JS Dependencies (Jest)
 └── Makefile                 # Build automation
 ```
 

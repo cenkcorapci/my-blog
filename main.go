@@ -7,7 +7,6 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/cenkcorapci/my-blog/internal/blog"
 )
@@ -22,7 +21,9 @@ var staticFS embed.FS
 var blogFS embed.FS
 
 func main() {
-	staticExport := flag.Bool("static", false, "Export the blog as a static site")
+	serve := flag.Bool("serve", false, "Serve the generated site locally")
+	distDir := flag.String("dist", "dist", "Directory to output the static site")
+	port := flag.String("port", "8080", "Port to serve on (only used with -serve)")
 	flag.Parse()
 
 	b, err := blog.NewBlog(templatesFS, staticFS, blogFS)
@@ -30,26 +31,18 @@ func main() {
 		log.Fatalf("Error initializing blog: %v", err)
 	}
 
-	// Load blog posts
+	// Always load posts and generate the site
 	if err := b.LoadPosts(); err != nil {
 		log.Fatal(err)
 	}
 
-	if *staticExport {
-		b.ExportStatic("dist")
-		return
-	}
+	b.Export(*distDir)
 
-	mux := b.Router()
-
-	// Get port from environment variable (default to 8080)
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	log.Printf("Starting server on port %s", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
-		log.Fatal("Error starting server:", err)
+	if *serve {
+		log.Printf("Serving %s on http://localhost:%s", *distDir, *port)
+		err := http.ListenAndServe(":"+*port, http.FileServer(http.Dir(*distDir)))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

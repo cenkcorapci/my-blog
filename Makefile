@@ -1,45 +1,43 @@
 # Makefile for Cenk Corapci Blog
 
 # Variables
-BINARY_NAME=blog
+BINARY_NAME=blog-gen
 DIST_DIR=dist
-FUNCTIONS_DIR=netlify/functions
 
-.PHONY: all build test static clean run help build-functions
+.PHONY: all build test static clean run help
 
-all: test build static
+all: test static
 
-build: build-functions
-	@echo "Building Go binary..."
+build:
+	@echo "Building generator binary..."
 	go build -o $(BINARY_NAME) main.go
 
-build-functions:
-	@echo "Building Netlify functions..."
-	mkdir -p $(FUNCTIONS_DIR)
-	go build -tags serverless -o $(FUNCTIONS_DIR)/blog serverless.go
+test: test-go test-js
 
-test:
-	@echo "Running tests..."
+test-go:
+	@echo "Running Go tests..."
 	go test -v ./...
 
+test-js:
+	@echo "Running JavaScript tests..."
+	npm test
+
 static:
-	@echo "Generating static site with front-end search..."
-	go run main.go -static
+	@echo "Generating static site..."
+	go run main.go -dist $(DIST_DIR)
 
 run:
-	@echo "Running blog locally with backend search..."
-	go run main.go
+	@echo "Running local preview server..."
+	go run main.go -serve -dist $(DIST_DIR)
 
 clean:
 	@echo "Cleaning up..."
 	rm -f $(BINARY_NAME)
 	rm -rf $(DIST_DIR)
-	rm -f $(FUNCTIONS_DIR)/blog
 
 help:
 	@echo "Available targets:"
-	@echo "  all      : Runs tests, builds binary/functions, and generates static site"
-	@echo "  build    : Builds the Go binary and Netlify functions"
-	@echo "  static   : Generates the static site in the dist/ directory (Frontend Search)"
-	@echo "  run      : Runs the blog server locally (Backend Search)"
-	@echo "  clean    : Removes build artifacts"
+	@echo "  all     : Runs tests and generates the static site"
+	@echo "  static  : Generates the static site in the dist/ directory"
+	@echo "  run     : Generates and serves the site locally for preview"
+	@echo "  clean   : Removes build artifacts"

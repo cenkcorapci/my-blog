@@ -1,45 +1,4 @@
 {
-  "posts": [
-    {
-      "id": "math-test",
-      "title": "Introduction to Linear Algebra",
-      "date": "2024-01-27",
-      "tags": [
-        "math",
-        "data-science",
-        "linear-algebra"
-      ],
-      "slug": "math-test"
-    },
-    {
-      "id": "building-apis",
-      "title": "Building RESTful APIs in Go",
-      "date": "2024-01-25",
-      "tags": [
-        "go",
-        "api",
-        "tutorial"
-      ],
-      "slug": "building-apis"
-    },
-    {
-      "id": "golang-tips",
-      "title": "10 Go Programming Tips",
-      "date": "2024-01-20",
-      "tags": null,
-      "slug": "golang-tips"
-    },
-    {
-      "id": "welcome",
-      "title": "Welcome to Cenk Corapci",
-      "date": "2024-01-15",
-      "tags": [
-        "general",
-        "introduction"
-      ],
-      "slug": "welcome"
-    }
-  ],
   "invertedIndex": {
     "1": [
       "building-apis",
@@ -837,5 +796,46 @@
       "golang-tips",
       "welcome"
     ]
-  }
+  },
+  "posts": [
+    {
+      "id": "math-test",
+      "title": "Introduction to Linear Algebra",
+      "date": "2024-01-27",
+      "tags": [
+        "math",
+        "data-science",
+        "linear-algebra"
+      ],
+      "slug": "math-test"
+    },
+    {
+      "id": "building-apis",
+      "title": "Building RESTful APIs in Go",
+      "date": "2024-01-25",
+      "tags": [
+        "go",
+        "api",
+        "tutorial"
+      ],
+      "slug": "building-apis"
+    },
+    {
+      "id": "golang-tips",
+      "title": "10 Go Programming Tips",
+      "date": "2024-01-20",
+      "tags": null,
+      "slug": "golang-tips"
+    },
+    {
+      "id": "welcome",
+      "title": "Welcome to Cenk Corapci",
+      "date": "2024-01-15",
+      "tags": [
+        "general",
+        "introduction"
+      ],
+      "slug": "welcome"
+    }
+  ]
 }

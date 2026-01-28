@@ -31,6 +31,7 @@
             ],
             throwOnError : false
         });"></script>
+    <script src="/static/search.js" defer></script>
 </head>
 
 <body>
@@ -39,8 +40,6 @@
             <nav>
                 <h1><a href="/">Cenk Corapci</a></h1>
                 <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/search">Search</a></li>
                     <li><a href="https://github.com/cenkcorapci/my-blog" target="_blank">GitHub</a></li>
                     <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
                     <li class="github-button-item">
@@ -80,6 +79,17 @@
             <header class="post-header">
                 <h1>Introduction to Linear Algebra</h1>
                 <time datetime=" 2024-01-27">January 27, 2024</time>
+                
+                <div class="post-tags" style="margin-top: 10px;">
+                    
+                    <a href="/search/?q=math" class="tag">math</a>
+                    
+                    <a href="/search/?q=data-science" class="tag">data-science</a>
+                    
+                    <a href="/search/?q=linear-algebra" class="tag">linear-algebra</a>
+                    
+                </div>
+                
             </header>
             <div class="post-body">
                 <h1 id="introduction-to-linear-algebra">Introduction to Linear Algebra</h1>
@@ -100,7 +110,6 @@
 
             </div>
         </article>
-
     </main>
 
     <script>
@@ -114,12 +123,6 @@
             localStorage.setItem('theme', newTheme);
         });
     </script>
-
-
-    <footer class="container">
-        <p>&copy; Cenk Corapci • <a href="https://github.com/cenkcorapci/my-blog" target="_blank">View on
-                GitHub</a></p>
-    </footer>
 
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>

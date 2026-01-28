@@ -15,14 +15,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Cenk Corapci</title>
+    <title>Cenk Corapci</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <script src="/static/search.js" defer></script>
-    
 </head>
 
 <body>
@@ -31,8 +29,6 @@
             <nav>
                 <h1><a href="/">Cenk Corapci</a></h1>
                 <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/search">Search</a></li>
                     <li><a href="https://github.com/cenkcorapci/my-blog" target="_blank">GitHub</a></li>
                     <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
                     <li class="github-button-item">
@@ -73,7 +69,7 @@
         </div>
 
         <div class="search-container">
-            <form action="/search" method="get" class="search-form" autocomplete="off">
+            <form action="/search/" method="get" class="search-form" autocomplete="off">
                 <div class="search-input-wrapper">
                     <input type="text" name="q" id="search-input" placeholder="Search posts..." class="search-input">
                     <div id="suggestions" class="suggestions-list"></div>
@@ -93,71 +89,27 @@
                 localStorage.setItem('theme', newTheme);
             });
 
-            { { if .StaticMode} }
             
             document.addEventListener('DOMContentLoaded', () => {
-                initClientSearch();
-            });
-            { {else } }
-            
-            const searchInput = document.getElementById('search-input');
-            const suggestionsList = document.getElementById('suggestions');
-
-            searchInput.addEventListener('input', async (e) => {
-                const query = e.target.value.trim();
-                if (query.length < 2) {
-                    suggestionsList.style.display = 'none';
-                    return;
-                }
-
-                try {
-                    
-                    const apiPath = window.location.hostname.includes('netlify.app') || window.location.port === '' ? '/api/suggestions' : '/api/suggestions';
-                    const response = await fetch(`${apiPath}?q=${encodeURIComponent(query)}`);
-                    const suggestions = await response.json();
-
-                    if (suggestions.length > 0) {
-                        suggestionsList.innerHTML = suggestions
-                            .map(s => `<div class="suggestion-item">${s}</div>`)
-                            .join('');
-                        suggestionsList.style.display = 'block';
-
-                        suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
-                            item.addEventListener('click', () => {
-                                searchInput.value = item.textContent;
-                                searchInput.closest('form').submit();
-                            });
-                        });
-                    } else {
-                        suggestionsList.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error fetching suggestions:', error);
+                if (typeof initClientSearch === 'function') {
+                    initClientSearch();
                 }
             });
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
-                    suggestionsList.style.display = 'none';
-                }
-            });
-            { { end } }
         </script>
 
         <div class="posts-grid">
             
-            
             <article class="post-card">
                 <time datetime=" 2024-01-27">January 27, 2024</time>
-                <h2><a href="/post/math-test">Introduction to Linear Algebra</a></h2>
+                <h2><a href="/post/math-test/">Introduction to Linear Algebra</a></h2>
                 
                 <div class="post-tags">
                     
-                    <a href="/search?q=math" class="tag">math</a>
+                    <a href="/search/?q=math" class="tag">math</a>
                     
-                    <a href="/search?q=data-science" class="tag">data-science</a>
+                    <a href="/search/?q=data-science" class="tag">data-science</a>
                     
-                    <a href="/search?q=linear-algebra" class="tag">linear-algebra</a>
+                    <a href="/search/?q=linear-algebra" class="tag">linear-algebra</a>
                     
                 </div>
                 
@@ -165,15 +117,15 @@
             
             <article class="post-card">
                 <time datetime=" 2024-01-25">January 25, 2024</time>
-                <h2><a href="/post/building-apis">Building RESTful APIs in Go</a></h2>
+                <h2><a href="/post/building-apis/">Building RESTful APIs in Go</a></h2>
                 
                 <div class="post-tags">
                     
-                    <a href="/search?q=go" class="tag">go</a>
+                    <a href="/search/?q=go" class="tag">go</a>
                     
-                    <a href="/search?q=api" class="tag">api</a>
+                    <a href="/search/?q=api" class="tag">api</a>
                     
-                    <a href="/search?q=tutorial" class="tag">tutorial</a>
+                    <a href="/search/?q=tutorial" class="tag">tutorial</a>
                     
                 </div>
                 
@@ -181,33 +133,26 @@
             
             <article class="post-card">
                 <time datetime=" 2024-01-20">January 20, 2024</time>
-                <h2><a href="/post/golang-tips">10 Go Programming Tips</a></h2>
+                <h2><a href="/post/golang-tips/">10 Go Programming Tips</a></h2>
                 
             </article>
             
             <article class="post-card">
                 <time datetime=" 2024-01-15">January 15, 2024</time>
-                <h2><a href="/post/welcome">Welcome to Cenk Corapci</a></h2>
+                <h2><a href="/post/welcome/">Welcome to Cenk Corapci</a></h2>
                 
                 <div class="post-tags">
                     
-                    <a href="/search?q=general" class="tag">general</a>
+                    <a href="/search/?q=general" class="tag">general</a>
                     
-                    <a href="/search?q=introduction" class="tag">introduction</a>
+                    <a href="/search/?q=introduction" class="tag">introduction</a>
                     
                 </div>
                 
             </article>
             
-            
         </div>
     </main>
-
-
-    <footer class="container">
-        <p>&copy; Cenk Corapci • <a href="https://github.com/cenkcorapci/my-blog" target="_blank">View on
-                GitHub</a></p>
-    </footer>
 
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>

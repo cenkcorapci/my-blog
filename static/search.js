@@ -259,10 +259,14 @@ async function initClientSearch() {
     });
 }
 
-// Export for use in templates
+// Export for use in templates and testing
 if (typeof window !== 'undefined') {
     window.BlogSearch = BlogSearch;
     window.blogSearch = blogSearch;
     window.initClientSearch = initClientSearch;
     window.renderPosts = renderPosts;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { BlogSearch, blogSearch };
 }

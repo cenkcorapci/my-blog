@@ -1,0 +1,13 @@
+{
+  "name": "my-blog",
+  "version": "1.0.0",
+  "description": "Minimal static blog generator",
+  "main": "static/search.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

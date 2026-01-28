@@ -6,10 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/fs"
 	"log"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -42,11 +39,6 @@ type Config struct {
 	Introduction string `yaml:"introduction"`
 }
 
-type SearchCache struct {
-	mu      sync.RWMutex
-	results map[string][]string // map[query][]postIDs
-}
-
 type InvertedIndex struct {
 	mu    sync.RWMutex
 	index map[string][]string // map[word][]postIDs
@@ -57,10 +49,8 @@ type Blog struct {
 	postList      []*Post
 	templates     *template.Template
 	markdown      goldmark.Markdown
-	searchCache   *SearchCache
 	invertedIndex *InvertedIndex
 	Config        Config
-	staticMode    bool
 	templatesFS   embed.FS
 	staticFS      embed.FS
 	blogFS        embed.FS
@@ -86,7 +76,6 @@ func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
 
 	templates, err := template.ParseFS(templatesFS, "templates/*.html")
 	if err != nil {
-		// During tests, templates might be missing
 		log.Printf("Warning: Error loading templates: %v", err)
 	}
 
@@ -95,7 +84,6 @@ func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
 		postList:      make([]*Post, 0),
 		templates:     templates,
 		markdown:      md,
-		searchCache:   &SearchCache{results: make(map[string][]string)},
 		invertedIndex: &InvertedIndex{index: make(map[string][]string)},
 		Config:        loadConfig(),
 		templatesFS:   templatesFS,
@@ -242,205 +230,73 @@ func contains(slice []string, item string) bool {
 	return false
 }
 
-func (b *Blog) search(query string) []*Post {
-	query = strings.TrimSpace(strings.ToLower(query))
-	if query == "" {
-		return nil
-	}
+func (b *Blog) Export(distDir string) {
+	os.RemoveAll(distDir)
+	os.MkdirAll(distDir, 0755)
 
-	b.searchCache.mu.RLock()
-	if cachedIDs, ok := b.searchCache.results[query]; ok {
-		b.searchCache.mu.RUnlock()
-		return b.getPostsByIDs(cachedIDs)
-	}
-	b.searchCache.mu.RUnlock()
-
-	trimmedQuery := strings.TrimSpace(query)
-	var tagMatches []*Post
-	for _, post := range b.posts {
-		for _, tag := range post.Tags {
-			if strings.EqualFold(tag, trimmedQuery) {
-				tagMatches = append(tagMatches, post)
-				break
-			}
-		}
-	}
-
-	if len(tagMatches) > 0 {
-		sort.Slice(tagMatches, func(i, j int) bool {
-			return tagMatches[i].Date.After(tagMatches[j].Date)
-		})
-		return tagMatches
-	}
-
-	words := tokenize(query)
-	b.invertedIndex.mu.RLock()
-	var matchingPostIDs []string
-	for i, word := range words {
-		word = strings.ToLower(word)
-		postIDs := b.invertedIndex.index[word]
-
-		if i == 0 {
-			matchingPostIDs = postIDs
-		} else {
-			matchingPostIDs = intersection(matchingPostIDs, postIDs)
-		}
-
-		if len(matchingPostIDs) == 0 {
-			break
-		}
-	}
-	b.invertedIndex.mu.RUnlock()
-
-	b.searchCache.mu.Lock()
-	b.searchCache.results[query] = matchingPostIDs
-	b.searchCache.mu.Unlock()
-
-	return b.getPostsByIDs(matchingPostIDs)
-}
-
-func intersection(a, b []string) []string {
-	set := make(map[string]bool)
-	for _, item := range a {
-		set[item] = true
-	}
-
-	var result []string
-	for _, item := range b {
-		if set[item] {
-			result = append(result, item)
-		}
-	}
-	return result
-}
-
-func (b *Blog) getPostsByIDs(ids []string) []*Post {
-	var posts []*Post
-	for _, id := range ids {
-		if post, ok := b.posts[id]; ok {
-			posts = append(posts, post)
-		}
-	}
-	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Date.After(posts[j].Date)
-	})
-	return posts
-}
-
-func (b *Blog) handleHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" && r.URL.Path != "" {
-		http.NotFound(w, r)
-		return
-	}
-
+	// Export Home
+	homeFile, _ := os.Create(filepath.Join(distDir, "index.html"))
 	data := map[string]interface{}{
 		"Title":      "Home",
 		"Posts":      b.postList,
 		"Config":     b.Config,
-		"StaticMode": b.staticMode,
+		"StaticMode": true,
 	}
+	b.templates.ExecuteTemplate(homeFile, "index.html", data)
+	homeFile.Close()
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	b.templates.ExecuteTemplate(w, "index.html", data)
-}
-
-func (b *Blog) handlePost(w http.ResponseWriter, r *http.Request) {
-	slug := strings.TrimPrefix(r.URL.Path, "/post/")
-	slug = strings.TrimSuffix(slug, "/")
-	if slug == "" {
-		http.NotFound(w, r)
-		return
-	}
-
-	post, ok := b.posts[slug]
-	if !ok {
-		http.NotFound(w, r)
-		return
-	}
-
-	data := map[string]interface{}{
-		"Title":      post.Title,
-		"Post":       post,
-		"Config":     b.Config,
-		"StaticMode": b.staticMode,
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	b.templates.ExecuteTemplate(w, "post.html", data)
-}
-
-func (b *Blog) handleSearch(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Get("q")
-	posts := b.search(query)
-
-	data := map[string]interface{}{
+	// Export Search Page
+	os.MkdirAll(filepath.Join(distDir, "search"), 0755)
+	searchFile, _ := os.Create(filepath.Join(distDir, "search", "index.html"))
+	searchData := map[string]interface{}{
 		"Title":      "Search Results",
-		"Query":      query,
-		"Posts":      posts,
+		"Query":      "",
+		"Posts":      nil,
 		"Config":     b.Config,
-		"StaticMode": b.staticMode,
+		"StaticMode": true,
 	}
+	b.templates.ExecuteTemplate(searchFile, "search.html", searchData)
+	searchFile.Close()
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	b.templates.ExecuteTemplate(w, "search.html", data)
-}
-
-func (b *Blog) handleSuggestions(w http.ResponseWriter, r *http.Request) {
-	query := strings.TrimSpace(strings.ToLower(r.URL.Query().Get("q")))
-	if query == "" {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode([]string{})
-		return
-	}
-
-	suggestionsMap := make(map[string]bool)
-	var suggestions []string
-
-	for _, post := range b.posts {
-		for _, tag := range post.Tags {
-			if strings.HasPrefix(strings.ToLower(tag), query) {
-				if !suggestionsMap[tag] {
-					suggestionsMap[tag] = true
-					suggestions = append(suggestions, tag)
-				}
-			}
+	// Export Posts
+	os.MkdirAll(filepath.Join(distDir, "post"), 0755)
+	for slug, post := range b.posts {
+		os.MkdirAll(filepath.Join(distDir, "post", slug), 0755)
+		postFile, _ := os.Create(filepath.Join(distDir, "post", slug, "index.html"))
+		postData := map[string]interface{}{
+			"Title":      post.Title,
+			"Post":       post,
+			"Config":     b.Config,
+			"StaticMode": true,
 		}
+		b.templates.ExecuteTemplate(postFile, "post.html", postData)
+		postFile.Close()
 	}
 
-	for _, post := range b.posts {
-		if strings.Contains(strings.ToLower(post.Title), query) {
-			if !suggestionsMap[post.Title] {
-				suggestionsMap[post.Title] = true
-				suggestions = append(suggestions, post.Title)
-			}
-		}
+	// Export Static Files
+	os.MkdirAll(filepath.Join(distDir, "static"), 0755)
+	entries, _ := b.staticFS.ReadDir("static")
+	for _, entry := range entries {
+		data, _ := b.staticFS.ReadFile("static/" + entry.Name())
+		os.WriteFile(filepath.Join(distDir, "static", entry.Name()), data, 0644)
 	}
 
-	if len(suggestions) > 10 {
-		suggestions = suggestions[:10]
+	// Export Search Index
+	var indexPosts []struct {
+		ID    string   `json:"id"`
+		Title string   `json:"title"`
+		Date  string   `json:"date"`
+		Tags  []string `json:"tags"`
+		Slug  string   `json:"slug"`
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(suggestions)
-}
-
-type SearchIndexPost struct {
-	ID    string   `json:"id"`
-	Title string   `json:"title"`
-	Date  string   `json:"date"`
-	Tags  []string `json:"tags"`
-	Slug  string   `json:"slug"`
-}
-
-type SearchIndex struct {
-	Posts         []SearchIndexPost   `json:"posts"`
-	InvertedIndex map[string][]string `json:"invertedIndex"`
-}
-
-func (b *Blog) NewSearchIndex() SearchIndex {
-	var posts []SearchIndexPost
 	for _, post := range b.postList {
-		posts = append(posts, SearchIndexPost{
+		indexPosts = append(indexPosts, struct {
+			ID    string   `json:"id"`
+			Title string   `json:"title"`
+			Date  string   `json:"date"`
+			Tags  []string `json:"tags"`
+			Slug  string   `json:"slug"`
+		}{
 			ID:    post.ID,
 			Title: post.Title,
 			Date:  post.Date.Format("2006-01-02"),
@@ -456,76 +312,13 @@ func (b *Blog) NewSearchIndex() SearchIndex {
 	}
 	b.invertedIndex.mu.RUnlock()
 
-	return SearchIndex{
-		Posts:         posts,
-		InvertedIndex: invertedIndex,
+	searchIndex := map[string]interface{}{
+		"posts":         indexPosts,
+		"invertedIndex": invertedIndex,
 	}
-}
 
-func (b *Blog) exportSearchIndex(distDir string) {
-	searchIndex := b.NewSearchIndex()
 	jsonData, _ := json.MarshalIndent(searchIndex, "", "  ")
 	os.WriteFile(filepath.Join(distDir, "search-index.json"), jsonData, 0644)
-}
 
-func (b *Blog) handleSearchIndex(w http.ResponseWriter, r *http.Request) {
-	searchIndex := b.NewSearchIndex()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(searchIndex)
-}
-
-func (b *Blog) ExportStatic(distDir string) {
-	b.staticMode = true
-	os.RemoveAll(distDir)
-	os.MkdirAll(distDir, 0755)
-
-	homeFile, _ := os.Create(filepath.Join(distDir, "index.html"))
-	b.handleHome(StaticResponseWriter{homeFile}, &http.Request{URL: &url.URL{Path: "/"}})
-	homeFile.Close()
-
-	os.MkdirAll(filepath.Join(distDir, "search"), 0755)
-	searchFile, _ := os.Create(filepath.Join(distDir, "search", "index.html"))
-	b.handleSearch(StaticResponseWriter{searchFile}, &http.Request{URL: &url.URL{Path: "/search"}})
-	searchFile.Close()
-
-	os.MkdirAll(filepath.Join(distDir, "post"), 0755)
-	for slug := range b.posts {
-		os.MkdirAll(filepath.Join(distDir, "post", slug), 0755)
-		postFile, _ := os.Create(filepath.Join(distDir, "post", slug, "index.html"))
-		b.handlePost(StaticResponseWriter{postFile}, &http.Request{URL: &url.URL{Path: "/post/" + slug}})
-		postFile.Close()
-	}
-
-	os.MkdirAll(filepath.Join(distDir, "static"), 0755)
-	entries, _ := b.staticFS.ReadDir("static")
-	for _, entry := range entries {
-		data, _ := b.staticFS.ReadFile("static/" + entry.Name())
-		os.WriteFile(filepath.Join(distDir, "static", entry.Name()), data, 0644)
-	}
-
-	b.exportSearchIndex(distDir)
-}
-
-type StaticResponseWriter struct {
-	File *os.File
-}
-
-func (s StaticResponseWriter) Header() http.Header         { return make(http.Header) }
-func (s StaticResponseWriter) Write(b []byte) (int, error) { return s.File.Write(b) }
-func (s StaticResponseWriter) WriteHeader(statusCode int)  {}
-
-func (b *Blog) Router() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", b.handleHome)
-	mux.HandleFunc("/post/", b.handlePost)
-	mux.HandleFunc("/search", b.handleSearch)
-	mux.HandleFunc("/api/suggestions", b.handleSuggestions)
-	mux.HandleFunc("/search-index.json", b.handleSearchIndex)
-
-	staticContent, err := fs.Sub(b.staticFS, "static")
-	if err == nil {
-		mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticContent))))
-	}
-
-	return mux
+	fmt.Printf("Successfully generated static site in ./%s\n", distDir)
 }
