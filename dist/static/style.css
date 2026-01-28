@@ -10,6 +10,10 @@
     --container-width: 720px;
 }
 
+html {
+    background-color: var(--background);
+}
+
 [data-theme="light"] {
     --background: #ffffff;
     --surface: #f8f8f8;
@@ -30,6 +34,9 @@
 body {
     background-color: var(--background);
     color: var(--text-primary);
+}
+
+body.theme-transitioning {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 

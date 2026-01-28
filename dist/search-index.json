@@ -1,19 +1,19 @@
 {
   "invertedIndex": {
     "1": [
+      "building-apis",
       "golang-tips",
       "math-test",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "10": [
       "golang-tips"
     ],
     "2": [
+      "building-apis",
       "golang-tips",
       "math-test",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "200": [
       "building-apis"
@@ -22,9 +22,9 @@
       "building-apis"
     ],
     "3": [
+      "building-apis",
       "golang-tips",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "4": [
       "golang-tips",
@@ -221,15 +221,15 @@
       "golang-tips"
     ],
     "error": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "errorf": [
       "golang-tips"
     ],
     "errors": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "euclidean": [
       "math-test"
@@ -272,10 +272,10 @@
       "golang-tips"
     ],
     "for": [
+      "building-apis",
       "golang-tips",
       "math-test",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "formulas": [
       "math-test"
@@ -305,8 +305,8 @@
       "math-test"
     ],
     "get": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "getting": [
       "building-apis"
@@ -315,9 +315,9 @@
       "math-test"
     ],
     "go": [
+      "building-apis",
       "golang-tips",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "goroutines": [
       "golang-tips"
@@ -332,8 +332,8 @@
       "building-apis"
     ],
     "handling": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "here": [
       "golang-tips"
@@ -364,8 +364,8 @@
       "math-test"
     ],
     "in": [
-      "math-test",
-      "building-apis"
+      "building-apis",
+      "math-test"
     ],
     "insights": [
       "math-test"
@@ -388,9 +388,9 @@
       "welcome"
     ],
     "it": [
+      "building-apis",
       "golang-tips",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "javascript": [
       "welcome"
@@ -464,8 +464,8 @@
       "building-apis"
     ],
     "minimal": [
-      "welcome",
-      "building-apis"
+      "building-apis",
+      "welcome"
     ],
     "missing": [
       "building-apis"
@@ -494,8 +494,8 @@
       "math-test"
     ],
     "need": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "newencoder": [
       "building-apis"
@@ -504,8 +504,8 @@
       "welcome"
     ],
     "nil": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "norm": [
       "math-test"
@@ -514,8 +514,8 @@
       "math-test"
     ],
     "not": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "of": [
       "math-test"
@@ -548,8 +548,8 @@
       "math-test"
     ],
     "post": [
-      "welcome",
-      "building-apis"
+      "building-apis",
+      "welcome"
     ],
     "powerful": [
       "golang-tips"
@@ -592,8 +592,8 @@
       "welcome"
     ],
     "resources": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "response": [
       "building-apis"
@@ -608,8 +608,8 @@
       "building-apis"
     ],
     "return": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "right": [
       "math-test"
@@ -618,15 +618,15 @@
       "building-apis"
     ],
     "s": [
-      "welcome",
-      "building-apis"
+      "building-apis",
+      "welcome"
     ],
     "search": [
       "welcome"
     ],
     "server": [
-      "welcome",
-      "building-apis"
+      "building-apis",
+      "welcome"
     ],
     "servers": [
       "building-apis"
@@ -663,8 +663,8 @@
       "building-apis"
     ],
     "started": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "status": [
       "building-apis"
@@ -692,9 +692,9 @@
       "golang-tips"
     ],
     "the": [
+      "building-apis",
       "golang-tips",
-      "math-test",
-      "building-apis"
+      "math-test"
     ],
     "their": [
       "math-test"
@@ -718,10 +718,10 @@
       "golang-tips"
     ],
     "to": [
+      "building-apis",
       "golang-tips",
       "math-test",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "today": [
       "math-test"
@@ -740,8 +740,8 @@
       "building-apis"
     ],
     "use": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "useful": [
       "golang-tips"
@@ -762,8 +762,8 @@
       "math-test"
     ],
     "w": [
-      "golang-tips",
-      "building-apis"
+      "building-apis",
+      "golang-tips"
     ],
     "we": [
       "math-test"
@@ -781,9 +781,9 @@
       "math-test"
     ],
     "with": [
+      "building-apis",
       "golang-tips",
-      "welcome",
-      "building-apis"
+      "welcome"
     ],
     "writing": [
       "welcome"
@@ -792,9 +792,9 @@
       "math-test"
     ],
     "you": [
+      "building-apis",
       "golang-tips",
-      "welcome",
-      "building-apis"
+      "welcome"
     ]
   },
   "posts": [
