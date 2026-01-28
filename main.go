@@ -1,5 +1,3 @@
-//go:build !serverless
-
 package main
 
 import (

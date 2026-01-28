@@ -1,29 +1,15 @@
 ---
-title: Welcome to Cenk Corapci
-date: 2024-01-15
-tags: general, introduction
+title: My Intention with This Blog
+date: 2026-01-28
+tags: general, philosophy
 ---
 
-# Welcome to Cenk Corapci
+# My Intention with This Blog
 
-This is my first blog post! I'm excited to share my thoughts and ideas with you.
+I’ll be honest: I know very little about blogging or how to be a good writer. I also don’t yet know how much time I want to invest in this.
 
-## About This Blog
+The purpose of this blog is not necessarily to share my thoughts or ideas with the world because I feel they must be heard. While I may do that in the future, I don’t currently feel a strong urge to broadcast opinions or insights for their own sake.
 
-This blog is built with Go and uses FeatherCSS for styling. It features:
+Like many developers, I enjoy improving myself in areas beyond my primary domain of expertise. I’ve found that documenting this process—essentially taking structured lecture notes in the form of blog posts—helps me learn more effectively. This blog is meant to serve that purpose.
 
-- Server-side rendering
-- Dark mode by default
-- Full-text search functionality
-- Minimal JavaScript
-
-## What's Next?
-
-I'll be writing about:
-
-1. Go programming
-2. Web development
-3. Software architecture
-4. And much more!
-
-Stay tuned for more content!
+My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my self-improvement journey. If others find the material useful or share similar interests, that’s a welcome bonus—but not the primary goal.

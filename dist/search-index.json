@@ -1,78 +1,117 @@
 {
   "invertedIndex": {
-    "1": [
-      "initial-blog-post"
-    ],
-    "2": [
-      "initial-blog-post"
-    ],
-    "3": [
-      "initial-blog-post"
-    ],
-    "4": [
+    "a": [
       "initial-blog-post"
     ],
     "about": [
       "initial-blog-post"
     ],
-    "and": [
+    "also": [
       "initial-blog-post"
     ],
-    "architecture": [
+    "another": [
+      "initial-blog-post"
+    ],
+    "areas": [
       "initial-blog-post"
     ],
     "be": [
       "initial-blog-post"
     ],
+    "because": [
+      "initial-blog-post"
+    ],
+    "become": [
+      "initial-blog-post"
+    ],
+    "beyond": [
+      "initial-blog-post"
+    ],
     "blog": [
       "initial-blog-post"
     ],
-    "built": [
+    "blogging": [
       "initial-blog-post"
     ],
-    "by": [
+    "bonus": [
       "initial-blog-post"
     ],
-    "cenk": [
+    "broadcast": [
       "initial-blog-post"
     ],
-    "content": [
+    "but": [
       "initial-blog-post"
     ],
-    "corapci": [
+    "corner": [
       "initial-blog-post"
     ],
-    "dark": [
+    "currently": [
       "initial-blog-post"
     ],
-    "default": [
+    "developers": [
       "initial-blog-post"
     ],
-    "development": [
+    "do": [
       "initial-blog-post"
     ],
-    "excited": [
+    "documenting": [
       "initial-blog-post"
     ],
-    "feathercss": [
+    "domain": [
       "initial-blog-post"
     ],
-    "features": [
+    "don": [
       "initial-blog-post"
     ],
-    "first": [
+    "effectively": [
+      "initial-blog-post"
+    ],
+    "enjoy": [
+      "initial-blog-post"
+    ],
+    "essentially": [
+      "initial-blog-post"
+    ],
+    "expertise": [
+      "initial-blog-post"
+    ],
+    "feel": [
+      "initial-blog-post"
+    ],
+    "find": [
       "initial-blog-post"
     ],
     "for": [
       "initial-blog-post"
     ],
-    "full": [
+    "form": [
       "initial-blog-post"
     ],
-    "functionality": [
+    "found": [
       "initial-blog-post"
     ],
-    "go": [
+    "future": [
+      "initial-blog-post"
+    ],
+    "goal": [
+      "initial-blog-post"
+    ],
+    "good": [
+      "initial-blog-post"
+    ],
+    "heard": [
+      "initial-blog-post"
+    ],
+    "helps": [
+      "initial-blog-post"
+    ],
+    "honest": [
+      "initial-blog-post"
+    ],
+    "hope": [
+      "initial-blog-post"
+    ],
+    "how": [
       "initial-blog-post"
     ],
     "i": [
@@ -81,25 +120,73 @@
     "ideas": [
       "initial-blog-post"
     ],
+    "if": [
+      "initial-blog-post"
+    ],
+    "improvement": [
+      "initial-blog-post"
+    ],
+    "improving": [
+      "initial-blog-post"
+    ],
+    "in": [
+      "initial-blog-post"
+    ],
+    "insights": [
+      "initial-blog-post"
+    ],
+    "intention": [
+      "initial-blog-post"
+    ],
+    "interests": [
+      "initial-blog-post"
+    ],
+    "internet": [
+      "initial-blog-post"
+    ],
+    "invest": [
+      "initial-blog-post"
+    ],
     "is": [
       "initial-blog-post"
     ],
     "it": [
       "initial-blog-post"
     ],
-    "javascript": [
+    "journey": [
+      "initial-blog-post"
+    ],
+    "know": [
+      "initial-blog-post"
+    ],
+    "learn": [
+      "initial-blog-post"
+    ],
+    "lecture": [
+      "initial-blog-post"
+    ],
+    "like": [
+      "initial-blog-post"
+    ],
+    "little": [
       "initial-blog-post"
     ],
     "ll": [
       "initial-blog-post"
     ],
-    "m": [
+    "many": [
       "initial-blog-post"
     ],
-    "minimal": [
+    "material": [
       "initial-blog-post"
     ],
-    "mode": [
+    "may": [
+      "initial-blog-post"
+    ],
+    "me": [
+      "initial-blog-post"
+    ],
+    "meant": [
       "initial-blog-post"
     ],
     "more": [
@@ -108,46 +195,103 @@
     "much": [
       "initial-blog-post"
     ],
+    "must": [
+      "initial-blog-post"
+    ],
     "my": [
       "initial-blog-post"
     ],
-    "next": [
+    "myself": [
       "initial-blog-post"
     ],
-    "post": [
+    "necessarily": [
       "initial-blog-post"
     ],
-    "programming": [
+    "not": [
       "initial-blog-post"
     ],
-    "rendering": [
+    "notes": [
+      "initial-blog-post"
+    ],
+    "of": [
+      "initial-blog-post"
+    ],
+    "opinions": [
+      "initial-blog-post"
+    ],
+    "or": [
+      "initial-blog-post"
+    ],
+    "others": [
+      "initial-blog-post"
+    ],
+    "own": [
+      "initial-blog-post"
+    ],
+    "personal": [
+      "initial-blog-post"
+    ],
+    "posts": [
+      "initial-blog-post"
+    ],
+    "primary": [
+      "initial-blog-post"
+    ],
+    "process": [
+      "initial-blog-post"
+    ],
+    "purpose": [
+      "initial-blog-post"
+    ],
+    "rather": [
+      "initial-blog-post"
+    ],
+    "record": [
       "initial-blog-post"
     ],
     "s": [
       "initial-blog-post"
     ],
-    "search": [
+    "sake": [
       "initial-blog-post"
     ],
-    "server": [
+    "self": [
+      "initial-blog-post"
+    ],
+    "serve": [
       "initial-blog-post"
     ],
     "share": [
       "initial-blog-post"
     ],
-    "side": [
+    "similar": [
       "initial-blog-post"
     ],
-    "software": [
+    "spamming": [
       "initial-blog-post"
     ],
-    "stay": [
+    "strong": [
       "initial-blog-post"
     ],
-    "styling": [
+    "structured": [
       "initial-blog-post"
     ],
-    "text": [
+    "t": [
+      "initial-blog-post"
+    ],
+    "taking": [
+      "initial-blog-post"
+    ],
+    "that": [
+      "initial-blog-post"
+    ],
+    "the": [
+      "initial-blog-post"
+    ],
+    "their": [
+      "initial-blog-post"
+    ],
+    "they": [
       "initial-blog-post"
     ],
     "this": [
@@ -156,42 +300,60 @@
     "thoughts": [
       "initial-blog-post"
     ],
+    "time": [
+      "initial-blog-post"
+    ],
     "to": [
       "initial-blog-post"
     ],
-    "tuned": [
+    "tutorial": [
       "initial-blog-post"
     ],
-    "uses": [
+    "urge": [
       "initial-blog-post"
     ],
-    "web": [
+    "useful": [
+      "initial-blog-post"
+    ],
+    "ve": [
+      "initial-blog-post"
+    ],
+    "very": [
+      "initial-blog-post"
+    ],
+    "want": [
       "initial-blog-post"
     ],
     "welcome": [
       "initial-blog-post"
     ],
-    "what": [
+    "while": [
       "initial-blog-post"
     ],
     "with": [
       "initial-blog-post"
     ],
-    "writing": [
+    "won": [
       "initial-blog-post"
     ],
-    "you": [
+    "world": [
+      "initial-blog-post"
+    ],
+    "writer": [
+      "initial-blog-post"
+    ],
+    "yet": [
       "initial-blog-post"
     ]
   },
   "posts": [
     {
       "id": "initial-blog-post",
-      "title": "Welcome to Cenk Corapci",
-      "date": "2024-01-15",
+      "title": "My Intention with This Blog",
+      "date": "2026-01-28",
       "tags": [
         "general",
-        "introduction"
+        "philosophy"
       ],
       "slug": "initial-blog-post"
     }
