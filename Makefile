@@ -8,7 +8,9 @@ DIST_DIR=dist
 
 all: test static
 
-clean-run: clean static run
+clean-run: clean static
+	(sleep 2 && open -a Firefox http://localhost:8080) &
+	$(MAKE) run
 
 build:
 	@echo "Building generator binary..."

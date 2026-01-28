@@ -336,15 +336,9 @@ main {
 /* Post entrance animations are handled by the 'main' tag globally */
 
 .post-header {
-    margin-bottom: 48px;
+    margin-bottom: 24px;
 }
 
-.post-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.05em;
-    margin-bottom: 12px;
-}
 
 .post-header time {
     color: var(--text-secondary);
