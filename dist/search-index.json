@@ -1,0 +1,841 @@
+{
+  "posts": [
+    {
+      "id": "math-test",
+      "title": "Introduction to Linear Algebra",
+      "date": "2024-01-27",
+      "tags": [
+        "math",
+        "data-science",
+        "linear-algebra"
+      ],
+      "slug": "math-test"
+    },
+    {
+      "id": "building-apis",
+      "title": "Building RESTful APIs in Go",
+      "date": "2024-01-25",
+      "tags": [
+        "go",
+        "api",
+        "tutorial"
+      ],
+      "slug": "building-apis"
+    },
+    {
+      "id": "golang-tips",
+      "title": "10 Go Programming Tips",
+      "date": "2024-01-20",
+      "tags": null,
+      "slug": "golang-tips"
+    },
+    {
+      "id": "welcome",
+      "title": "Welcome to Cenk Corapci",
+      "date": "2024-01-15",
+      "tags": [
+        "general",
+        "introduction"
+      ],
+      "slug": "welcome"
+    }
+  ],
+  "invertedIndex": {
+    "1": [
+      "building-apis",
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "10": [
+      "golang-tips"
+    ],
+    "2": [
+      "building-apis",
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "200": [
+      "building-apis"
+    ],
+    "201": [
+      "building-apis"
+    ],
+    "3": [
+      "building-apis",
+      "golang-tips",
+      "welcome"
+    ],
+    "4": [
+      "golang-tips",
+      "welcome"
+    ],
+    "404": [
+      "building-apis"
+    ],
+    "5": [
+      "golang-tips"
+    ],
+    "500": [
+      "building-apis"
+    ],
+    "8080": [
+      "building-apis"
+    ],
+    "a": [
+      "golang-tips",
+      "math-test"
+    ],
+    "ab": [
+      "math-test"
+    ],
+    "about": [
+      "welcome"
+    ],
+    "algebra": [
+      "math-test"
+    ],
+    "always": [
+      "golang-tips"
+    ],
+    "an": [
+      "math-test"
+    ],
+    "and": [
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "api": [
+      "building-apis"
+    ],
+    "apis": [
+      "building-apis"
+    ],
+    "appropriate": [
+      "building-apis"
+    ],
+    "architecture": [
+      "welcome"
+    ],
+    "are": [
+      "golang-tips"
+    ],
+    "as": [
+      "golang-tips"
+    ],
+    "at": [
+      "math-test"
+    ],
+    "b": [
+      "math-test"
+    ],
+    "be": [
+      "welcome"
+    ],
+    "best": [
+      "building-apis"
+    ],
+    "between": [
+      "golang-tips"
+    ],
+    "blog": [
+      "welcome"
+    ],
+    "build": [
+      "building-apis"
+    ],
+    "building": [
+      "building-apis"
+    ],
+    "built": [
+      "welcome"
+    ],
+    "by": [
+      "math-test",
+      "welcome"
+    ],
+    "c": [
+      "math-test"
+    ],
+    "cancellation": [
+      "golang-tips"
+    ],
+    "cenk": [
+      "welcome"
+    ],
+    "channels": [
+      "golang-tips"
+    ],
+    "cleaned": [
+      "golang-tips"
+    ],
+    "cleanup": [
+      "golang-tips"
+    ],
+    "close": [
+      "golang-tips"
+    ],
+    "codes": [
+      "building-apis"
+    ],
+    "communicate": [
+      "golang-tips"
+    ],
+    "conclusion": [
+      "building-apis"
+    ],
+    "concurrency": [
+      "golang-tips"
+    ],
+    "content": [
+      "welcome"
+    ],
+    "context": [
+      "golang-tips"
+    ],
+    "corapci": [
+      "welcome"
+    ],
+    "created": [
+      "building-apis"
+    ],
+    "creating": [
+      "building-apis"
+    ],
+    "dark": [
+      "welcome"
+    ],
+    "data": [
+      "math-test"
+    ],
+    "default": [
+      "welcome"
+    ],
+    "defer": [
+      "golang-tips"
+    ],
+    "delete": [
+      "building-apis"
+    ],
+    "density": [
+      "math-test"
+    ],
+    "dependencies": [
+      "building-apis"
+    ],
+    "developers": [
+      "golang-tips"
+    ],
+    "development": [
+      "welcome"
+    ],
+    "distribution": [
+      "math-test"
+    ],
+    "don": [
+      "golang-tips"
+    ],
+    "dots": [
+      "math-test"
+    ],
+    "e": [
+      "math-test"
+    ],
+    "easy": [
+      "building-apis"
+    ],
+    "encode": [
+      "building-apis"
+    ],
+    "encoding": [
+      "building-apis"
+    ],
+    "engineering": [
+      "math-test"
+    ],
+    "ensure": [
+      "golang-tips"
+    ],
+    "err": [
+      "golang-tips"
+    ],
+    "error": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "errorf": [
+      "golang-tips"
+    ],
+    "errors": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "euclidean": [
+      "math-test"
+    ],
+    "everything": [
+      "building-apis"
+    ],
+    "excited": [
+      "welcome"
+    ],
+    "f": [
+      "math-test"
+    ],
+    "failed": [
+      "golang-tips"
+    ],
+    "fast": [
+      "building-apis"
+    ],
+    "feathercss": [
+      "welcome"
+    ],
+    "features": [
+      "welcome"
+    ],
+    "few": [
+      "golang-tips"
+    ],
+    "file": [
+      "golang-tips"
+    ],
+    "first": [
+      "golang-tips",
+      "welcome"
+    ],
+    "fmt": [
+      "golang-tips"
+    ],
+    "focused": [
+      "golang-tips"
+    ],
+    "for": [
+      "building-apis",
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "formulas": [
+      "math-test"
+    ],
+    "found": [
+      "building-apis"
+    ],
+    "foundation": [
+      "math-test"
+    ],
+    "frac": [
+      "math-test"
+    ],
+    "full": [
+      "welcome"
+    ],
+    "function": [
+      "math-test"
+    ],
+    "functionality": [
+      "welcome"
+    ],
+    "functions": [
+      "golang-tips"
+    ],
+    "fundamental": [
+      "math-test"
+    ],
+    "get": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "getting": [
+      "building-apis"
+    ],
+    "given": [
+      "math-test"
+    ],
+    "go": [
+      "building-apis",
+      "golang-tips",
+      "welcome"
+    ],
+    "goroutines": [
+      "golang-tips"
+    ],
+    "handle": [
+      "golang-tips"
+    ],
+    "handlefunc": [
+      "building-apis"
+    ],
+    "handleusers": [
+      "building-apis"
+    ],
+    "handling": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "here": [
+      "golang-tips"
+    ],
+    "how": [
+      "building-apis"
+    ],
+    "http": [
+      "building-apis"
+    ],
+    "i": [
+      "welcome"
+    ],
+    "ideas": [
+      "welcome"
+    ],
+    "if": [
+      "golang-tips",
+      "math-test"
+    ],
+    "ignore": [
+      "golang-tips"
+    ],
+    "ij": [
+      "math-test"
+    ],
+    "ik": [
+      "math-test"
+    ],
+    "in": [
+      "building-apis",
+      "math-test"
+    ],
+    "insights": [
+      "math-test"
+    ],
+    "interface": [
+      "golang-tips"
+    ],
+    "interfaces": [
+      "golang-tips"
+    ],
+    "internal": [
+      "building-apis"
+    ],
+    "introduction": [
+      "math-test"
+    ],
+    "is": [
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "it": [
+      "building-apis",
+      "golang-tips",
+      "welcome"
+    ],
+    "javascript": [
+      "welcome"
+    ],
+    "json": [
+      "building-apis"
+    ],
+    "just": [
+      "golang-tips"
+    ],
+    "k": [
+      "math-test"
+    ],
+    "keep": [
+      "golang-tips"
+    ],
+    "kj": [
+      "math-test"
+    ],
+    "learn": [
+      "building-apis"
+    ],
+    "learning": [
+      "math-test"
+    ],
+    "left": [
+      "math-test"
+    ],
+    "library": [
+      "building-apis"
+    ],
+    "linear": [
+      "math-test"
+    ],
+    "listenandserve": [
+      "building-apis"
+    ],
+    "ll": [
+      "math-test",
+      "welcome"
+    ],
+    "look": [
+      "math-test"
+    ],
+    "m": [
+      "math-test",
+      "welcome"
+    ],
+    "machine": [
+      "math-test"
+    ],
+    "makes": [
+      "building-apis"
+    ],
+    "mathbb": [
+      "math-test"
+    ],
+    "mathematical": [
+      "math-test"
+    ],
+    "matrix": [
+      "math-test"
+    ],
+    "may": [
+      "golang-tips"
+    ],
+    "memory": [
+      "golang-tips"
+    ],
+    "methods": [
+      "building-apis"
+    ],
+    "minimal": [
+      "building-apis",
+      "welcome"
+    ],
+    "missing": [
+      "building-apis"
+    ],
+    "mode": [
+      "welcome"
+    ],
+    "more": [
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "mu": [
+      "math-test"
+    ],
+    "much": [
+      "welcome"
+    ],
+    "multiplication": [
+      "math-test"
+    ],
+    "my": [
+      "welcome"
+    ],
+    "n": [
+      "math-test"
+    ],
+    "need": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "newencoder": [
+      "building-apis"
+    ],
+    "next": [
+      "welcome"
+    ],
+    "nil": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "norm": [
+      "math-test"
+    ],
+    "normal": [
+      "math-test"
+    ],
+    "not": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "of": [
+      "math-test"
+    ],
+    "ok": [
+      "building-apis"
+    ],
+    "open": [
+      "golang-tips"
+    ],
+    "operation": [
+      "golang-tips"
+    ],
+    "os": [
+      "golang-tips"
+    ],
+    "p": [
+      "math-test"
+    ],
+    "package": [
+      "building-apis"
+    ],
+    "parameter": [
+      "golang-tips"
+    ],
+    "pass": [
+      "golang-tips"
+    ],
+    "pi": [
+      "math-test"
+    ],
+    "post": [
+      "building-apis",
+      "welcome"
+    ],
+    "powerful": [
+      "golang-tips"
+    ],
+    "practices": [
+      "building-apis"
+    ],
+    "probability": [
+      "math-test"
+    ],
+    "product": [
+      "math-test"
+    ],
+    "programming": [
+      "golang-tips",
+      "welcome"
+    ],
+    "proper": [
+      "building-apis"
+    ],
+    "properly": [
+      "golang-tips"
+    ],
+    "provides": [
+      "building-apis"
+    ],
+    "put": [
+      "building-apis"
+    ],
+    "r": [
+      "math-test"
+    ],
+    "reliable": [
+      "building-apis"
+    ],
+    "removing": [
+      "building-apis"
+    ],
+    "rendering": [
+      "welcome"
+    ],
+    "resources": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "response": [
+      "building-apis"
+    ],
+    "rest": [
+      "building-apis"
+    ],
+    "restful": [
+      "building-apis"
+    ],
+    "retrieving": [
+      "building-apis"
+    ],
+    "return": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "right": [
+      "math-test"
+    ],
+    "robust": [
+      "building-apis"
+    ],
+    "s": [
+      "building-apis",
+      "welcome"
+    ],
+    "search": [
+      "welcome"
+    ],
+    "server": [
+      "building-apis",
+      "welcome"
+    ],
+    "servers": [
+      "building-apis"
+    ],
+    "share": [
+      "welcome"
+    ],
+    "shared": [
+      "golang-tips"
+    ],
+    "side": [
+      "welcome"
+    ],
+    "sigma": [
+      "math-test"
+    ],
+    "small": [
+      "golang-tips"
+    ],
+    "smaller": [
+      "golang-tips"
+    ],
+    "software": [
+      "welcome"
+    ],
+    "some": [
+      "golang-tips",
+      "math-test"
+    ],
+    "sqrt": [
+      "math-test"
+    ],
+    "standard": [
+      "building-apis"
+    ],
+    "started": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "status": [
+      "building-apis"
+    ],
+    "stay": [
+      "math-test",
+      "welcome"
+    ],
+    "styling": [
+      "welcome"
+    ],
+    "successful": [
+      "building-apis"
+    ],
+    "sum": [
+      "math-test"
+    ],
+    "t": [
+      "golang-tips"
+    ],
+    "text": [
+      "welcome"
+    ],
+    "that": [
+      "golang-tips"
+    ],
+    "the": [
+      "building-apis",
+      "golang-tips",
+      "math-test"
+    ],
+    "their": [
+      "math-test"
+    ],
+    "them": [
+      "golang-tips"
+    ],
+    "these": [
+      "golang-tips"
+    ],
+    "this": [
+      "welcome"
+    ],
+    "thoughts": [
+      "welcome"
+    ],
+    "times": [
+      "math-test"
+    ],
+    "tips": [
+      "golang-tips"
+    ],
+    "to": [
+      "building-apis",
+      "golang-tips",
+      "math-test",
+      "welcome"
+    ],
+    "today": [
+      "math-test"
+    ],
+    "tuned": [
+      "math-test",
+      "welcome"
+    ],
+    "txt": [
+      "golang-tips"
+    ],
+    "up": [
+      "golang-tips"
+    ],
+    "updating": [
+      "building-apis"
+    ],
+    "use": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "useful": [
+      "golang-tips"
+    ],
+    "users": [
+      "building-apis"
+    ],
+    "uses": [
+      "welcome"
+    ],
+    "using": [
+      "building-apis"
+    ],
+    "v": [
+      "math-test"
+    ],
+    "vector": [
+      "math-test"
+    ],
+    "w": [
+      "building-apis",
+      "golang-tips"
+    ],
+    "we": [
+      "math-test"
+    ],
+    "web": [
+      "welcome"
+    ],
+    "welcome": [
+      "welcome"
+    ],
+    "what": [
+      "welcome"
+    ],
+    "where": [
+      "math-test"
+    ],
+    "with": [
+      "building-apis",
+      "golang-tips",
+      "welcome"
+    ],
+    "writing": [
+      "welcome"
+    ],
+    "x": [
+      "math-test"
+    ],
+    "you": [
+      "building-apis",
+      "golang-tips",
+      "welcome"
+    ]
+  }
+}

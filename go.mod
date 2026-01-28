@@ -6,6 +6,8 @@ require github.com/yuin/goldmark v1.7.16
 
 require (
 	github.com/alecthomas/chroma/v2 v2.23.1 // indirect
+	github.com/aws/aws-lambda-go v1.52.0 // indirect
+	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f // indirect
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc // indirect
