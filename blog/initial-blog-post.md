@@ -12,4 +12,4 @@ The purpose of this blog is not necessarily to share my thoughts or ideas with t
 
 Like many developers, I enjoy improving myself in areas beyond my primary domain of expertise. I’ve found that documenting this process—essentially taking structured lecture notes in the form of blog posts—helps me learn more effectively. This blog is meant to serve that purpose.
 
-My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my self-improvement journey. If others find the material useful or share similar interests, that’s a welcome bonus—but not the primary goal.
+My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my studying, creating some useful material for others. 
