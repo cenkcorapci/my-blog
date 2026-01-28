@@ -437,7 +437,7 @@ type SearchIndex struct {
 	InvertedIndex map[string][]string `json:"invertedIndex"`
 }
 
-func (b *Blog) exportSearchIndex(distDir string) {
+func (b *Blog) NewSearchIndex() SearchIndex {
 	var posts []SearchIndexPost
 	for _, post := range b.postList {
 		posts = append(posts, SearchIndexPost{
@@ -456,13 +456,22 @@ func (b *Blog) exportSearchIndex(distDir string) {
 	}
 	b.invertedIndex.mu.RUnlock()
 
-	searchIndex := SearchIndex{
+	return SearchIndex{
 		Posts:         posts,
 		InvertedIndex: invertedIndex,
 	}
+}
 
+func (b *Blog) exportSearchIndex(distDir string) {
+	searchIndex := b.NewSearchIndex()
 	jsonData, _ := json.MarshalIndent(searchIndex, "", "  ")
 	os.WriteFile(filepath.Join(distDir, "search-index.json"), jsonData, 0644)
+}
+
+func (b *Blog) handleSearchIndex(w http.ResponseWriter, r *http.Request) {
+	searchIndex := b.NewSearchIndex()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(searchIndex)
 }
 
 func (b *Blog) ExportStatic(distDir string) {
@@ -511,6 +520,7 @@ func (b *Blog) Router() *http.ServeMux {
 	mux.HandleFunc("/post/", b.handlePost)
 	mux.HandleFunc("/search", b.handleSearch)
 	mux.HandleFunc("/api/suggestions", b.handleSuggestions)
+	mux.HandleFunc("/search-index.json", b.handleSearchIndex)
 
 	staticContent, err := fs.Sub(b.staticFS, "static")
 	if err == nil {

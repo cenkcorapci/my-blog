@@ -20,9 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    {{if .StaticMode}}
     <script src="/static/search.js" defer></script>
-    {{end}}
 </head>
 
 <body>
@@ -93,55 +91,12 @@
                 localStorage.setItem('theme', newTheme);
             });
 
-            { { if .StaticMode} }
-            // Client-side search (static mode)
+            // Initialize client-side functionality (search & autocomplete)
             document.addEventListener('DOMContentLoaded', () => {
-                initClientSearch();
-            });
-            { {else } }
-            // Server-side search (dynamic mode)
-            const searchInput = document.getElementById('search-input');
-            const suggestionsList = document.getElementById('suggestions');
-
-            searchInput.addEventListener('input', async (e) => {
-                const query = e.target.value.trim();
-                if (query.length < 2) {
-                    suggestionsList.style.display = 'none';
-                    return;
-                }
-
-                try {
-                    // Normalize API path to work with Netlify functions if deployed there
-                    const apiPath = window.location.hostname.includes('netlify.app') || window.location.port === '' ? '/api/suggestions' : '/api/suggestions';
-                    const response = await fetch(`${apiPath}?q=${encodeURIComponent(query)}`);
-                    const suggestions = await response.json();
-
-                    if (suggestions.length > 0) {
-                        suggestionsList.innerHTML = suggestions
-                            .map(s => `<div class="suggestion-item">${s}</div>`)
-                            .join('');
-                        suggestionsList.style.display = 'block';
-
-                        suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
-                            item.addEventListener('click', () => {
-                                searchInput.value = item.textContent;
-                                searchInput.closest('form').submit();
-                            });
-                        });
-                    } else {
-                        suggestionsList.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error fetching suggestions:', error);
+                if (typeof initClientSearch === 'function') {
+                    initClientSearch();
                 }
             });
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
-                    suggestionsList.style.display = 'none';
-                }
-            });
-            { { end } }
         </script>
 
         <div class="posts-grid">
@@ -164,7 +119,6 @@
             {{end}}
         </div>
     </main>
-
 
     <footer class="container">
         <p>&copy; {{.Config.BlogName}} • <a href="https://github.com/cenkcorapci/my-blog" target="_blank">View on
