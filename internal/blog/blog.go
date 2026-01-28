@@ -43,6 +43,8 @@ type Config struct {
 	BlogName     string `yaml:"blog_name"`
 	Introduction string `yaml:"introduction"`
 	BaseURL      string `yaml:"base_url"`
+	LinkedInURL  string `yaml:"linkedin_url"`
+	GitHubURL    string `yaml:"github_url"`
 }
 
 type InvertedIndex struct {
@@ -114,6 +116,7 @@ func loadConfig() Config {
 			BlogName:     "Cenk Corapci",
 			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
 			BaseURL:      "https://cenkcorapci.com",
+			LinkedInURL:  "https://linkedin.com/in/cenkcorapci",
 		}
 	}
 
@@ -124,11 +127,18 @@ func loadConfig() Config {
 			BlogName:     "Cenk Corapci",
 			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
 			BaseURL:      "https://cenkcorapci.com",
+			LinkedInURL:  "https://linkedin.com/in/cenkcorapci",
 		}
 	}
 
 	if config.BaseURL == "" {
 		config.BaseURL = "https://cenkcorapci.com"
+	}
+	if config.LinkedInURL == "" {
+		config.LinkedInURL = "https://linkedin.com/in/cenkcorapci"
+	}
+	if config.GitHubURL == "" {
+		config.GitHubURL = "https://github.com/cenkcorapci/my-blog"
 	}
 	return config
 }

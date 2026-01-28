@@ -58,11 +58,10 @@
             <nav>
                 <h1><a href="/">{{.Config.BlogName}}</a></h1>
                 <ul class="nav-links">
-                    <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
+                    <li><a href="{{.Config.LinkedInURL}}" target="_blank">LinkedIn</a></li>
                     <li class="github-button-item">
-                        <a class="github-button" href="https://github.com/cenkcorapci/my-blog"
-                            data-icon="octicon-repo-forked" data-size="large"
-                            aria-label="Fork cenkcorapci/my-blog on GitHub">Fork</a>
+                        <a class="github-button" href="{{.Config.GitHubURL}}" data-icon="octicon-repo-forked"
+                            data-size="large" aria-label="Fork {{.Config.GitHubURL}} on GitHub">Fork</a>
                     </li>
                     <li>
                         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
