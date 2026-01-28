@@ -6,6 +6,7 @@
 
 A minimal, high-performance static blog generator in Go with zero-latency client-side search.
 
+
 ## Features
 
 - 🌙 **Sophisticated Minimalist Style** - Beautiful dark theme with Inter typography
@@ -21,6 +22,16 @@ A minimal, high-performance static blog generator in Go with zero-latency client
 - 🌐 **Netlify Ready** - Optimized for high-performance JAMstack deployment with clean URLs
 
 ## Quick Start
+
+### If you want to start your own blog from this repo
+- Copy the codebase
+- Change the `config.yaml` file to
+    - Change the name of the blog 
+    - Change the introduction on the top of the page
+    - Add your social links to the `config.yaml` file
+- Add your posts to the `blog/` directory
+- run `make clean-run` to generate the static site and start the preview server
+- Deploy to your favorite static host!
 
 ### Local Development
 
