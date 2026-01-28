@@ -1,4 +1,4 @@
-# Cenk Corapci
+# My Blog
 
 ![CI Status](https://github.com/cenkcorapci/my-blog/actions/workflows/ci.yml/badge.svg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e078470a-6aac-40d8-8464-808888ae3d22/deploy-status)](https://app.netlify.com/projects/cenkcorapci/deploys)
