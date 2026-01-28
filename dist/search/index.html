@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html data-theme="dark">
-<script>
+<!doctype html><html data-theme=dark><script>
     (function () {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
@@ -10,34 +8,8 @@
             document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
         }
     })();
-</script>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search - Cenk Corapci</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="/static/search.js" defer></script>
-</head>
-
-<body>
-    <header>
-        <div class="container">
-            <nav>
-                <h1><a href="/">Cenk Corapci</a></h1>
-                <ul class="nav-links">
-                    <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
-                    <li class="github-button-item">
-                        <a class="github-button" href="https://github.com/cenkcorapci/my-blog"
-                            data-icon="octicon-repo-forked" data-size="large"
-                            aria-label="Fork cenkcorapci/my-blog on GitHub">Fork</a>
-                    </li>
-                    <li>
-                        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Search - Cenk Corapci</title><link rel=stylesheet href=/static/style.css><link rel=preload href=/search-index.json as=fetch crossorigin><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel=stylesheet><script src=/static/search.js defer></script><header><div class=container><nav><h1><a href=/>Cenk Corapci</a></h1><ul class=nav-links><li><a href=https://linkedin.com/in/cenkcorapci target=_blank>LinkedIn</a><li class=github-button-item><a class=github-button href=https://github.com/cenkcorapci/my-blog data-icon=octicon-repo-forked data-size=large aria-label="Fork cenkcorapci/my-blog on GitHub">Fork</a><li><button id=theme-toggle class=theme-toggle aria-label="Toggle theme">
+<svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="5"></circle>
@@ -50,35 +22,11 @@
                                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                             </svg>
-                            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+<svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                            </svg>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
-        <div class="search-container">
-            <form action="/search/" method="get" class="search-form" autocomplete="off">
-                <div class="search-input-wrapper">
-                    <input type="text" name="q" id="search-input" placeholder="Search posts..." class="search-input">
-                    <div id="suggestions" class="suggestions-list"></div>
-                </div>
-                <button type="submit" class="btn">Search</button>
-            </form>
-        </div>
-
-        <h2 id="search-title">Search Results</h2>
-        <div id="search-results" class="posts-grid">
-            <p>Enter a search query above to find posts.</p>
-        </div>
-
-        <script>
+                            </svg></button></ul></nav></div></header><main class=container><div class=search-container><form action=/search/ class=search-form autocomplete=off><div class=search-input-wrapper><input name=q id=search-input placeholder="Search posts..." class=search-input><div id=suggestions class=suggestions-list></div></div><button class=btn>Search</button></form></div><h2 id=search-title>Search Results</h2><div id=search-results class=posts-grid><p>Enter a search query above to find posts.</div><script>
             const toggleBtn = document.getElementById('theme-toggle');
 
             toggleBtn.addEventListener('click', () => {
@@ -100,11 +48,20 @@
                 if (typeof initClientSearch === 'function') {
                     initClientSearch();
                 }
+
+                
+                document.querySelectorAll('a').forEach(link => {
+                    const url = link.getAttribute('href');
+                    if (url && url.startsWith('/') && !url.includes('#')) {
+                        link.addEventListener('mouseenter', () => {
+                            if (!document.querySelector(`link[href="${url}"]`)) {
+                                const l = document.createElement('link');
+                                l.rel = 'prefetch';
+                                l.href = url;
+                                document.head.appendChild(l);
+                            }
+                        }, { once: true });
+                    }
+                });
             });
-        </script>
-    </main>
-
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-</body>
-
-</html>
+        </script></main><script async defer src=https://buttons.github.io/buttons.js></script>

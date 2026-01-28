@@ -9,12 +9,14 @@ A minimal, high-performance static blog generator in Go with zero-latency client
 ## Features
 
 - 🌙 **Sophisticated Minimalist Style** - Beautiful dark theme with Inter typography
-- 🔍 **Full-Text Frontend Search** - Instant search & suggestions without a backend
+- 🔍 **Full-Text Frontend Search** - Instant search & suggestions with keyboard navigation
 - 🏷️ **Tag Filtering** - Clickable tags to explore related content
 - 📝 **Markdown support** - Write posts in Markdown, rendered with goldmark
 - 📐 **Math Support** - Render complex mathematical formulas using KaTeX (MathJax)
-- 🌓 **Theme Switching** - Toggle between sophisticated dark and clean light modes
-- ⚡ **Zero Backend** - Purely static HTML/JS/CSS, deployable anywhere (Netlify, GitHub Pages, etc.)
+- 🌓 **Theme Switching** - Toggle between dark and light modes with zero-flicker transitions
+- 🚀 **Instant Navigation** - Hover-based prefetching for near-zero latency between pages
+- 📦 **Automated Minification** - Built-in Go minifier for HTML, CSS, JS, and JSON
+- ⚡ **Zero Backend** - Purely static, deployable anywhere (Netlify, GitHub Pages, etc.)
 - 🌐 **Netlify Ready** - Optimized for high-performance JAMstack deployment with clean URLs
 
 ## Quick Start
@@ -82,9 +84,9 @@ The project includes a `netlify.toml` which is ready for deployment.
 
 ## Architecture
 
-- **Generator**: Go (Loads posts, converts Markdown, renders templates)
-- **Search**: Vanilla JS (Consumes a JSON inverted index for instant search)
-- **Style**: Vanilla CSS (Tailored dark/light themes)
+- **Generator**: Go (Loads posts, renders goldmark, minifies assets for production)
+- **Search**: Vanilla JS (Consumes a minified JSON inverted index; supports keyboard navigation)
+- **Style**: Vanilla CSS (Tailored dark/light themes; minified during build)
 
 ## Project Structure
 

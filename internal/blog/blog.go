@@ -16,11 +16,16 @@ import (
 	"time"
 
 	mathjax "github.com/litao91/goldmark-mathjax"
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/css"
+	mhtml "github.com/tdewolff/minify/v2/html"
+	"github.com/tdewolff/minify/v2/js"
+	mjson "github.com/tdewolff/minify/v2/json"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
-	"github.com/yuin/goldmark/renderer/html"
+	ghml "github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
 
@@ -54,6 +59,7 @@ type Blog struct {
 	templatesFS   embed.FS
 	staticFS      embed.FS
 	blogFS        embed.FS
+	minifier      *minify.M
 }
 
 func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
@@ -69,8 +75,8 @@ func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
 			parser.WithAutoHeadingID(),
 		),
 		goldmark.WithRendererOptions(
-			html.WithHardWraps(),
-			html.WithXHTML(),
+			ghml.WithHardWraps(),
+			ghml.WithXHTML(),
 		),
 	)
 
@@ -78,6 +84,12 @@ func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
 	if err != nil {
 		log.Printf("Warning: Error loading templates: %v", err)
 	}
+
+	m := minify.New()
+	m.AddFunc("text/css", css.Minify)
+	m.AddFunc("text/html", mhtml.Minify)
+	m.AddFunc("text/javascript", js.Minify)
+	m.AddFunc("application/json", mjson.Minify)
 
 	return &Blog{
 		posts:         make(map[string]*Post),
@@ -89,6 +101,7 @@ func NewBlog(templatesFS, staticFS, blogFS embed.FS) (*Blog, error) {
 		templatesFS:   templatesFS,
 		staticFS:      staticFS,
 		blogFS:        blogFS,
+		minifier:      m,
 	}, nil
 }
 
@@ -98,7 +111,7 @@ func loadConfig() Config {
 		log.Printf("Warning: Could not read config.yaml, using defaults: %v", err)
 		return Config{
 			BlogName:     "Cenk Corapci",
-			Introduction: "I'm Cenk, a data engineer based in Netherlands.",
+			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
 		}
 	}
 
@@ -107,7 +120,7 @@ func loadConfig() Config {
 		log.Printf("Warning: Could not parse config.yaml, using defaults: %v", err)
 		return Config{
 			BlogName:     "Cenk Corapci",
-			Introduction: "I'm Cenk, a data engineer based in Netherlands.",
+			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
 		}
 	}
 	return config
@@ -234,20 +247,24 @@ func (b *Blog) Export(distDir string) {
 	os.RemoveAll(distDir)
 	os.MkdirAll(distDir, 0755)
 
+	exportHTML := func(filename string, templateName string, data interface{}) {
+		var buf bytes.Buffer
+		_ = b.templates.ExecuteTemplate(&buf, templateName, data)
+		minified, _ := b.minifier.Bytes("text/html", buf.Bytes())
+		_ = os.WriteFile(filepath.Join(distDir, filename), minified, 0644)
+	}
+
 	// Export Home
-	homeFile, _ := os.Create(filepath.Join(distDir, "index.html"))
 	data := map[string]interface{}{
 		"Title":      "Home",
 		"Posts":      b.postList,
 		"Config":     b.Config,
 		"StaticMode": true,
 	}
-	b.templates.ExecuteTemplate(homeFile, "index.html", data)
-	homeFile.Close()
+	exportHTML("index.html", "index.html", data)
 
 	// Export Search Page
 	os.MkdirAll(filepath.Join(distDir, "search"), 0755)
-	searchFile, _ := os.Create(filepath.Join(distDir, "search", "index.html"))
 	searchData := map[string]interface{}{
 		"Title":      "Search Results",
 		"Query":      "",
@@ -255,30 +272,39 @@ func (b *Blog) Export(distDir string) {
 		"Config":     b.Config,
 		"StaticMode": true,
 	}
-	b.templates.ExecuteTemplate(searchFile, "search.html", searchData)
-	searchFile.Close()
+	exportHTML("search/index.html", "search.html", searchData)
 
 	// Export Posts
 	os.MkdirAll(filepath.Join(distDir, "post"), 0755)
 	for slug, post := range b.posts {
 		os.MkdirAll(filepath.Join(distDir, "post", slug), 0755)
-		postFile, _ := os.Create(filepath.Join(distDir, "post", slug, "index.html"))
 		postData := map[string]interface{}{
 			"Title":      post.Title,
 			"Post":       post,
 			"Config":     b.Config,
 			"StaticMode": true,
 		}
-		b.templates.ExecuteTemplate(postFile, "post.html", postData)
-		postFile.Close()
+		exportHTML("post/"+slug+"/index.html", "post.html", postData)
 	}
 
 	// Export Static Files
 	os.MkdirAll(filepath.Join(distDir, "static"), 0755)
 	entries, _ := b.staticFS.ReadDir("static")
 	for _, entry := range entries {
-		data, _ := b.staticFS.ReadFile("static/" + entry.Name())
-		os.WriteFile(filepath.Join(distDir, "static", entry.Name()), data, 0644)
+		path := "static/" + entry.Name()
+		data, _ := b.staticFS.ReadFile(path)
+
+		var minified []byte
+		ext := filepath.Ext(entry.Name())
+		switch ext {
+		case ".css":
+			minified, _ = b.minifier.Bytes("text/css", data)
+		case ".js":
+			minified, _ = b.minifier.Bytes("text/javascript", data)
+		default:
+			minified = data
+		}
+		os.WriteFile(filepath.Join(distDir, "static", entry.Name()), minified, 0644)
 	}
 
 	// Export Search Index
@@ -321,8 +347,8 @@ func (b *Blog) Export(distDir string) {
 		"invertedIndex": invertedIndex,
 	}
 
-	jsonData, _ := json.MarshalIndent(searchIndex, "", "  ")
+	jsonData, _ := json.Marshal(searchIndex) // Minified JSON
 	os.WriteFile(filepath.Join(distDir, "search-index.json"), jsonData, 0644)
 
-	fmt.Printf("Successfully generated static site in ./%s\n", distDir)
+	fmt.Printf("Successfully generated optimized static site in ./%s\n", distDir)
 }

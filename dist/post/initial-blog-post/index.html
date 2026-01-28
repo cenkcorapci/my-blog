@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html data-theme="dark">
-<script>
+<!doctype html><html data-theme=dark><script>
     (function () {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
@@ -10,19 +8,7 @@
             document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
         }
     })();
-</script>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Intention with This Blog - Cenk Corapci</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>My Intention with This Blog - Cenk Corapci</title><link rel=stylesheet href=/static/style.css><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js onload="renderMathInElement(document.body, {
             delimiters: [
                 {left: '$$', right: '$$', display: true},
                 {left: '$', right: '$', display: false},
@@ -30,25 +16,8 @@
                 {left: '\\[', right: '\\]', display: true}
             ],
             throwOnError : false
-        });"></script>
-    <script src="/static/search.js" defer></script>
-</head>
-
-<body>
-    <header>
-        <div class="container">
-            <nav>
-                <h1><a href="/">Cenk Corapci</a></h1>
-                <ul class="nav-links">
-                    <li><a href="https://linkedin.com/in/cenkcorapci" target="_blank">LinkedIn</a></li>
-                    <li class="github-button-item">
-                        <a class="github-button" href="https://github.com/cenkcorapci/my-blog"
-                            data-icon="octicon-repo-forked" data-size="large"
-                            aria-label="Fork cenkcorapci/my-blog on GitHub">Fork</a>
-                    </li>
-                    <li>
-                        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        });"></script><script src=/static/search.js defer></script><link rel=preload href=/search-index.json as=fetch crossorigin><header><div class=container><nav><h1><a href=/>Cenk Corapci</a></h1><ul class=nav-links><li><a href=https://linkedin.com/in/cenkcorapci target=_blank>LinkedIn</a><li class=github-button-item><a class=github-button href=https://github.com/cenkcorapci/my-blog data-icon=octicon-repo-forked data-size=large aria-label="Fork cenkcorapci/my-blog on GitHub">Fork</a><li><button id=theme-toggle class=theme-toggle aria-label="Toggle theme">
+<svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="5"></circle>
@@ -61,43 +30,11 @@
                                 <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                             </svg>
-                            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+<svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                            </svg>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
-        <article class="post-content">
-            <header class="post-header">
-                <h1>My Intention with This Blog</h1>
-                <time datetime=" 2026-01-28">January 28, 2026</time>
-                
-                <div class="post-tags" style="margin-top: 10px;">
-                    
-                    <a href="/search/?q=general" class="tag">general</a>
-                    
-                </div>
-                
-            </header>
-            <div class="post-body">
-                <h1 id="my-intention-with-this-blog">My Intention with This Blog</h1>
-<p>I’ll be honest: I know very little about blogging or how to be a good writer. I also don’t yet know how much time I want to invest in this.</p>
-<p>The purpose of this blog is not necessarily to share my thoughts or ideas with the world because I feel they must be heard. While I may do that in the future, I don’t currently feel a strong urge to broadcast opinions or insights for their own sake.</p>
-<p>Like many developers, I enjoy improving myself in areas beyond my primary domain of expertise. I’ve found that documenting this process—essentially taking structured lecture notes in the form of blog posts—helps me learn more effectively. This blog is meant to serve that purpose.</p>
-<p>My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my studying, creating some useful material for others.</p>
-
-            </div>
-        </article>
-    </main>
-
-    <script>
+                            </svg></button></ul></nav></div></header><main class=container><article class=post-content><header class=post-header><h1>My Intention with This Blog</h1><time datetime=2026-01-28>January 28, 2026</time><div class=post-tags style=margin-top:10px><a href="/search/?q=general" class=tag>general</a></div></header><div class=post-body><h1 id=my-intention-with-this-blog>My Intention with This Blog</h1><p>I’ll be honest: I know very little about blogging or how to be a good writer. I also don’t yet know how much time I want to invest in this.<p>The purpose of this blog is not necessarily to share my thoughts or ideas with the world because I feel they must be heard. While I may do that in the future, I don’t currently feel a strong urge to broadcast opinions or insights for their own sake.<p>Like many developers, I enjoy improving myself in areas beyond my primary domain of expertise. I’ve found that documenting this process—essentially taking structured lecture notes in the form of blog posts—helps me learn more effectively. This blog is meant to serve that purpose.<p>My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my studying, creating some useful material for others.</div></article></main><script>
         const toggleBtn = document.getElementById('theme-toggle');
 
         toggleBtn.addEventListener('click', () => {
@@ -113,9 +50,21 @@
                 document.body.classList.remove('theme-transitioning');
             }, 300);
         });
-    </script>
 
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-</body>
-
-</html>
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a').forEach(link => {
+                const url = link.getAttribute('href');
+                if (url && url.startsWith('/') && !url.includes('#')) {
+                    link.addEventListener('mouseenter', () => {
+                        if (!document.querySelector(`link[href="${url}"]`)) {
+                            const l = document.createElement('link');
+                            l.rel = 'prefetch';
+                            l.href = url;
+                            document.head.appendChild(l);
+                        }
+                    }, { once: true });
+                }
+            });
+        });
+    </script><script async defer src=https://buttons.github.io/buttons.js></script>

@@ -10,6 +10,8 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f // indirect
+	github.com/tdewolff/minify/v2 v2.24.8 // indirect
+	github.com/tdewolff/parse/v2 v2.8.5 // indirect
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

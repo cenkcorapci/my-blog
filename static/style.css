@@ -203,7 +203,8 @@ main {
     transition: all 0.2s ease;
 }
 
-.suggestion-item:hover {
+.suggestion-item:hover,
+.suggestion-item.selected {
     background: var(--surface-hover);
     color: var(--text-primary);
 }

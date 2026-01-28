@@ -214,9 +214,12 @@ async function initClientSearch() {
         }
     }
 
+    let selectedSuggestionIndex = -1;
+
     // Handle suggestions on input
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim();
+        selectedSuggestionIndex = -1; // Reset selection
 
         if (query.length < 2) {
             suggestionsList.style.display = 'none';
@@ -227,7 +230,7 @@ async function initClientSearch() {
 
         if (suggestions.length > 0) {
             suggestionsList.innerHTML = suggestions
-                .map(s => `<div class="suggestion-item">${s}</div>`)
+                .map((s, index) => `<div class="suggestion-item" data-index="${index}">${s}</div>`)
                 .join('');
             suggestionsList.style.display = 'block';
 
@@ -235,7 +238,6 @@ async function initClientSearch() {
                 item.addEventListener('click', () => {
                     searchInput.value = item.textContent;
                     suggestionsList.style.display = 'none';
-                    // Navigate to search page with query
                     window.location.href = `/search/?q=${encodeURIComponent(item.textContent)}`;
                 });
             });
@@ -244,10 +246,48 @@ async function initClientSearch() {
         }
     });
 
+    // Handle keyboard navigation
+    searchInput.addEventListener('keydown', (e) => {
+        const items = suggestionsList.querySelectorAll('.suggestion-item');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+            updateSelectedSuggestion(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+            updateSelectedSuggestion(items);
+        } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+            e.preventDefault();
+            const selectedItem = items[selectedSuggestionIndex];
+            searchInput.value = selectedItem.textContent;
+            suggestionsList.style.display = 'none';
+            window.location.href = `/search/?q=${encodeURIComponent(selectedItem.textContent)}`;
+        } else if (e.key === 'Escape') {
+            suggestionsList.style.display = 'none';
+        }
+    });
+
+    function updateSelectedSuggestion(items) {
+        items.forEach((item, index) => {
+            if (index === selectedSuggestionIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
     // Handle form submission
     const searchForm = searchInput.closest('form');
     if (searchForm) {
         searchForm.addEventListener('submit', (e) => {
+            // Only submit if no suggestion is currently highlighted by keyboard
+            if (selectedSuggestionIndex >= 0) return;
+
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {

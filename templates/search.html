@@ -17,6 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search - {{.Config.BlogName}}</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="preload" href="/search-index.json" as="fetch" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -100,6 +101,21 @@
                 if (typeof initClientSearch === 'function') {
                     initClientSearch();
                 }
+
+                // Instant Prefetching
+                document.querySelectorAll('a').forEach(link => {
+                    const url = link.getAttribute('href');
+                    if (url && url.startsWith('/') && !url.includes('#')) {
+                        link.addEventListener('mouseenter', () => {
+                            if (!document.querySelector(`link[href="${url}"]`)) {
+                                const l = document.createElement('link');
+                                l.rel = 'prefetch';
+                                l.href = url;
+                                document.head.appendChild(l);
+                            }
+                        }, { once: true });
+                    }
+                });
             });
         </script>
     </main>
