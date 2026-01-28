@@ -16,6 +16,7 @@ A minimal, high-performance static blog generator in Go with zero-latency client
 - 🌓 **Theme Switching** - Toggle between dark and light modes with zero-flicker transitions
 - 🚀 **Instant Navigation** - Hover-based prefetching for near-zero latency between pages
 - 📦 **Automated Minification** - Built-in Go minifier for HTML, CSS, JS, and JSON
+- 📈 **SEO Optimized** - Automatic generation of `sitemap.xml`, `robots.txt`, and Open Graph tags
 - ⚡ **Zero Backend** - Purely static, deployable anywhere (Netlify, GitHub Pages, etc.)
 - 🌐 **Netlify Ready** - Optimized for high-performance JAMstack deployment with clean URLs
 

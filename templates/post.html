@@ -16,6 +16,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Post.Title}} - {{.Config.BlogName}}</title>
+    <meta name="description" content="{{.Post.Title}} - A blog post by {{.Config.BlogName}}">
+    <link rel="canonical" href="{{.Config.BaseURL}}/post/{{.Post.Slug}}/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{.Config.BaseURL}}/post/{{.Post.Slug}}/">
+    <meta property="og:title" content="{{.Post.Title}}">
+    <meta property="og:description" content="{{.Post.Title}} - A blog post by {{.Config.BlogName}}">
+    <meta property="og:image" content="{{.Config.BaseURL}}/static/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{.Config.BaseURL}}/post/{{.Post.Slug}}/">
+    <meta property="twitter:title" content="{{.Post.Title}}">
+    <meta property="twitter:description" content="{{.Post.Title}} - A blog post by {{.Config.BlogName}}">
+    <meta property="twitter:image" content="{{.Config.BaseURL}}/static/og-image.png">
+
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

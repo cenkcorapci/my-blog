@@ -42,6 +42,7 @@ type Post struct {
 type Config struct {
 	BlogName     string `yaml:"blog_name"`
 	Introduction string `yaml:"introduction"`
+	BaseURL      string `yaml:"base_url"`
 }
 
 type InvertedIndex struct {
@@ -112,6 +113,7 @@ func loadConfig() Config {
 		return Config{
 			BlogName:     "Cenk Corapci",
 			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
+			BaseURL:      "https://cenkcorapci.com",
 		}
 	}
 
@@ -121,7 +123,12 @@ func loadConfig() Config {
 		return Config{
 			BlogName:     "Cenk Corapci",
 			Introduction: "Hello 👋. I'm Cenk. A data engineer living in the Netherlands.",
+			BaseURL:      "https://cenkcorapci.com",
 		}
+	}
+
+	if config.BaseURL == "" {
+		config.BaseURL = "https://cenkcorapci.com"
 	}
 	return config
 }
@@ -350,5 +357,31 @@ func (b *Blog) Export(distDir string) {
 	jsonData, _ := json.Marshal(searchIndex) // Minified JSON
 	os.WriteFile(filepath.Join(distDir, "search-index.json"), jsonData, 0644)
 
-	fmt.Printf("Successfully generated optimized static site in ./%s\n", distDir)
+	// Generate robots.txt
+	robotsContent := fmt.Sprintf("User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n", b.Config.BaseURL)
+	os.WriteFile(filepath.Join(distDir, "robots.txt"), []byte(robotsContent), 0644)
+
+	// Generate sitemap.xml
+	var sitemap bytes.Buffer
+	sitemap.WriteString(`<?xml version="1.0" encoding="UTF-8"?>`)
+	sitemap.WriteString("\n")
+	sitemap.WriteString(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`)
+	sitemap.WriteString("\n")
+
+	// Home page
+	sitemap.WriteString(fmt.Sprintf("\t<url><loc>%s/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n", b.Config.BaseURL))
+
+	// Search page
+	sitemap.WriteString(fmt.Sprintf("\t<url><loc>%s/search/</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>\n", b.Config.BaseURL))
+
+	// Posts
+	for _, post := range b.postList {
+		sitemap.WriteString(fmt.Sprintf("\t<url><loc>%s/post/%s/</loc><lastmod>%s</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n",
+			b.Config.BaseURL, post.Slug, post.Date.Format("2006-01-02")))
+	}
+
+	sitemap.WriteString(`</urlset>`)
+	os.WriteFile(filepath.Join(distDir, "sitemap.xml"), sitemap.Bytes(), 0644)
+
+	fmt.Printf("Successfully generated optimized static site with SEO assets in ./%s\n", distDir)
 }

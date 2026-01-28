@@ -8,8 +8,7 @@ DIST_DIR=dist
 
 all: test static
 
-clean-run:
-	clean static run
+clean-run: clean static run
 
 build:
 	@echo "Building generator binary..."
