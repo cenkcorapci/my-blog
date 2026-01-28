@@ -13,3 +13,11 @@ The purpose of this blog is not necessarily to share my thoughts or ideas with t
 Like many developers, I enjoy improving myself in areas beyond my primary domain of expertise. I’ve found that documenting this process—essentially taking structured lecture notes in the form of blog posts—helps me learn more effectively. This blog is meant to serve that purpose.
 
 My hope is that it won’t become yet another tutorial-spamming corner of the internet, but rather a personal record of my studying, creating some useful material for others. 
+
+---
+
+### You can also follow me on;
+
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@cenk.corapci) [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/cenkcorapci)
+
+
