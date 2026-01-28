@@ -8,6 +8,9 @@ DIST_DIR=dist
 
 all: test static
 
+clean-run:
+	clean static run
+
 build:
 	@echo "Building generator binary..."
 	go build -o $(BINARY_NAME) main.go

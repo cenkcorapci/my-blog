@@ -10,6 +10,10 @@
     --container-width: 720px;
 }
 
+@view-transition {
+    navigation: auto;
+}
+
 html {
     background-color: var(--background);
 }
@@ -104,6 +108,7 @@ body {
 /* Header & Nav */
 header {
     padding: 60px 0;
+    view-transition-name: main-header;
 }
 
 nav {
@@ -161,6 +166,19 @@ nav a:hover {
 /* Main Content */
 main {
     padding-bottom: 100px;
+    animation: pageIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Search */
@@ -315,22 +333,7 @@ main {
     background: var(--surface-hover);
 }
 
-/* Post Content Page */
-.post-content {
-    animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* Post entrance animations are handled by the 'main' tag globally */
 
 .post-header {
     margin-bottom: 48px;
