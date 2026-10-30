@@ -1,67 +1,93 @@
 ---
-title: HNSW for Vector Search, Briefly
+title: HNSW
 date: 2026-10-29
 tags: vector databases, hnsw, machine learning
 ---
 
-# HNSW for Vector Search, Briefly
+# HNSW
 
-Nearest-neighbour search has an obvious implementation: compare a query vector
-with every stored vector and return the closest results. It is exact, simple,
-and eventually expensive.
+The simplest nearest-neighbour search compares a query with every vector and
+returns the closest ones. It is exact. It also gets more expensive for every
+vector added to the collection.
 
-If a collection has \(N\) vectors of dimension \(d\), that scan does work
-proportional to \(N \times d\) for every query. It is often fine for small
-collections. It becomes a poor default when queries must stay fast as \(N\)
-grows.
-
-HNSW, short for *Hierarchical Navigable Small World*, is one way to avoid
-looking everywhere.
+HNSW, short for *Hierarchical Navigable Small World*, is an approximate way to
+search. It uses a graph instead of scanning the whole collection.
 
 ## The graph
 
-HNSW stores vectors in a graph. Nearby vectors are connected. A query begins
-at a sparse upper layer, where long jumps get it near the right part of the
-space, then descends through denser layers until it searches the bottom layer
-for the best candidates.
+Each vector is a node. Nodes are connected to nearby nodes. The bottom layer
+contains every vector. The layers above it contain fewer vectors and act as
+shortcuts across the graph.
 
-The result is approximate. HNSW may miss a true nearest neighbour, but it
-usually needs far fewer distance calculations than an exhaustive scan.
+A query starts at the top, follows the neighbour that gets it closer to the
+query, and then moves down one layer. At the bottom layer it keeps a wider set
+of candidates and returns the best ones.
 
-Two parameters matter most:
+This is a simplified version of the search:
 
-- `M` limits how many neighbours a node keeps. It affects graph size and
-  quality.
-- `ef_search` controls how many candidates a query considers at the dense
-  layer. Raising it usually improves recall and increases query cost.
+```cpp
+std::vector<Hit> Search(
+    const Vector& query,
+    std::size_t k,
+    std::size_t ef_search) {
+  NodeId current = entry_point;
 
-There is no setting that is correct for every application. A product-matching
-workflow may spend more CPU to avoid missing candidates. A recommendation
-endpoint may accept lower recall for a tighter latency budget.
+  for (int layer = top_layer; layer > 0; --layer) {
+    current = GreedySearch(query, current, layer);
+  }
 
-## Why one graph per segment
+  auto candidates = SearchLayer(query, {current}, 0, ef_search);
+  return TopK(candidates, k);
+}
+```
 
-A single mutable HNSW graph is inconvenient for a write-heavy database. Adding
-a vector changes graph links; deleting one leaves holes; recovery after an
-interrupted graph update needs careful handling.
+`GreedySearch` makes long jumps in sparse layers. `SearchLayer` examines more
+neighbours in the dense bottom layer. The code hides many details, but this is
+the useful mental model: get close quickly, then spend the search budget where
+it matters.
 
-The design used by [Aster](/post/building-aster-a-practical-vector-database/)
-is different: a flushed, immutable storage segment owns its own graph. New
-writes are handled separately. A search gathers candidates from each segment,
-reconciles newer values and deletes, then returns the best remaining results.
-Compaction merges old segments and builds a new graph for the merged data.
+## The trade-off
 
-This keeps graph construction away from the write path and makes immutable
-storage do some useful work. It also means the number of segments matters:
-too many segments make one query search too many graphs, so compaction is part
-of search performance.
+HNSW can miss a true nearest neighbour. In exchange, it usually calculates far
+fewer distances than an exhaustive scan.
 
-## The status in Aster
+Two parameters are worth knowing:
 
-Exact search is Aster's correctness baseline. Its segmented-HNSW
-implementation is still awaiting its recall and latency verification gate.
-That is the right time to be precise about what HNSW provides: not a guarantee
-of the exact top results, but a measurable recall/latency trade-off.
+- `M` is the maximum number of neighbours kept by a node. A larger value makes
+  the graph larger and can improve its connectivity.
+- `ef_search` is the number of candidates considered at search time. A larger
+  value generally improves recall and increases CPU cost.
 
-For the surrounding storage and recovery model, see
-[Why a Vector Database Needs a Write-Ahead Log](/post/why-a-vector-database-needs-a-write-ahead-log/).
+For example, a caller might choose a larger search budget for a matching
+workflow where missing a candidate is costly:
+
+```cpp
+SearchRequest request;
+request.vector = query;
+request.top_k = 10;
+request.ef_search = 128;
+
+auto hits = index.Search(request);
+```
+
+There is no best value for every workload. The meaningful question is whether
+the results are good enough at the latency and CPU cost the application can
+afford.
+
+## Segments
+
+A single mutable HNSW graph is awkward when writes are frequent. Inserting a
+vector changes graph links. Deleting a vector leaves a hole. Rebuilding the
+whole graph after every change would be wasteful.
+
+A common alternative is to build one graph for each immutable storage segment.
+New writes stay in a small mutable buffer. Searches collect candidates from
+each segment and merge them. Compaction merges old segments and builds a new
+graph for the result.
+
+This makes writes and search easier to reason about, but it does not remove
+the work. Too many segments mean too many graphs per query, so compaction is
+also part of search performance.
+
+For the storage path behind immutable segments, see
+[Write-ahead log](/post/why-a-vector-database-needs-a-write-ahead-log/).

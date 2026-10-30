@@ -1,61 +1,92 @@
 ---
-title: Why a Vector Database Needs a Write-Ahead Log
+title: Write-ahead log
 date: 2026-10-29
 tags: databases, storage, vector databases
 ---
 
-# Why a Vector Database Needs a Write-Ahead Log
+# Write-ahead log
 
-An in-memory vector index is easy to understand: add vectors, search them,
-and keep the process running. The awkward question is what happens when the
-process stops halfway through a write.
+An in-memory index is easy to understand until the process stops halfway
+through a write.
 
-If the only copy of a recent write was in memory, it is gone. If a data file
-was being changed in place, it may be partly written. A database needs a way
-to recover without guessing which state is valid.
+If a recent write exists only in memory, it is lost. If a data file is being
+changed in place, it may be partly written. A database needs a way to recover
+without guessing which state is valid.
 
-That is what a write-ahead log, or WAL, is for.
+A write-ahead log, or WAL, is the usual answer.
 
 ## Append first
 
-A WAL is an append-only record of changes. Before the database treats a write
-as durable, it records enough information to replay that write later. Appending
-one new record is simpler to recover than altering several existing files.
+A WAL is an append-only sequence of changes. Before the database treats a
+write as durable, it records enough information to replay that write later.
 
-In the durable path used by [Aster](/post/building-aster-a-practical-vector-database/),
-a write is recorded in the WAL and placed in a memtable, an in-memory write
-buffer. Later, a flush turns the memtable into an immutable SSTable segment on
-disk.
+The basic write path looks like this:
 
-On restart, Aster loads the segment manifest and its existing SSTables, then
-replays the WAL. Entries already represented in a flushed segment do not need
-to be reconstructed; entries that were still only in memory do.
+```cpp
+Status Database::Upsert(Row row) {
+  const Record record = Encode(row);
 
-## Why immutable files help
+  RETURN_IF_ERROR(wal_.Append(record));
+  RETURN_IF_ERROR(wal_.Sync());
 
-The flush does not update an existing segment. It creates a new immutable one.
-Updates and deletes are newer records; a delete is represented by a tombstone.
-Compaction later merges segments, retains the latest visible value, and drops
-tombstones once it is safe to do so.
+  memtable_.Upsert(std::move(row));
+  return Status::Ok();
+}
+```
 
-This creates more files in the short term, but gives the system a simple
-recovery story:
+The exact synchronization policy is a trade-off. Calling `Sync` for every
+write gives a stronger durability boundary but costs more. Grouping several
+writes before syncing improves throughput but can lose the most recent group
+after a crash.
 
-1. A WAL contains recent writes.
-2. A manifest identifies complete, immutable segments.
-3. Recovery opens the segments and replays the remaining log.
+The important part is the order: the database does not rely on the in-memory
+memtable as its only record of an acknowledged write.
 
-The database has to decide when to synchronize its WAL to disk, so durability
-is still a policy choice. But the important property is that a crash does not
-leave the database trying to interpret a half-mutated search index.
+## Flush
 
-## What this has to do with vector search
+The memtable cannot grow forever. A flush writes its current rows to a new,
+immutable segment:
 
-Vectors do not make persistence less important. A search index can often be
-rebuilt from stored vectors, but rebuilds take time and may be difficult to
-coordinate with incoming writes. Keeping an ordered log and immutable vector
-segments makes recovery a normal storage operation rather than a special
-emergency path.
+```cpp
+Status Database::Flush() {
+  Segment segment = BuildSegment(memtable_.Snapshot());
 
-For the approximate-search side of the design, see
-[HNSW for Vector Search, Briefly](/post/hnsw-for-vector-search/).
+  RETURN_IF_ERROR(segment.Write(data_dir_));
+  RETURN_IF_ERROR(manifest_.Add(segment));
+
+  memtable_.Clear();
+  return wal_.Truncate();
+}
+```
+
+The ordering details depend on the database, but the idea is consistent:
+publish a complete immutable segment before discarding the log entries that it
+contains.
+
+Updates and deletes are newer records. A delete is usually represented by a
+tombstone. Compaction later merges segments, retains the latest visible value,
+and removes tombstones when older copies can no longer be returned.
+
+## Recovery
+
+After a crash, the database opens complete segments first, then replays the
+WAL entries that were not yet flushed:
+
+```cpp
+Status Database::Recover() {
+  RETURN_IF_ERROR(manifest_.Load());
+  RETURN_IF_ERROR(OpenSegments(manifest_));
+
+  for (const Record& record : wal_.ReadAll()) {
+    memtable_.Apply(record);
+  }
+  return Status::Ok();
+}
+```
+
+This is why append-only logs and immutable files fit together well. A crash
+does not leave the database trying to interpret a partly changed search index.
+It has complete segments and an ordered record of newer changes.
+
+For the approximate-search side, see
+[HNSW](/post/hnsw-for-vector-search/).
