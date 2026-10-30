@@ -1,7 +1,7 @@
 ---
 title: Building Aster: A Vector Database for the Rest of Us
 date: 2026-10-30
-tags: vector databases, databases, c++, machine learning
+tags: vector databases, databases, machine learning
 ---
 
 # Building Aster: A Vector Database for the Rest of Us
@@ -18,8 +18,8 @@ things to tune. Sometimes that is the right answer. Usually it is not.
 
 I am building [Aster](https://github.com/cenkcorapci/Aster) for the other
 cases: applications that need vector search, but do not need a data platform.
-It is a CPU-first C++20 vector database that can run as a small HTTP service or
-inside a C++ application. The intended experience is closer to adding a local
+It is a CPU-first vector database that can run as a small HTTP service or
+inside an application. The intended experience is closer to adding a local
 database than adopting a new piece of infrastructure.
 
 The basic setup should look like this:
@@ -86,24 +86,6 @@ This does not mean an Arduino is now a semantic-search cluster. It means a
 small local index can be treated as a normal part of an embedded application
 instead of an excuse to add a separate service.
 
-For applications written in C++, Aster can be linked directly:
-
-```cpp
-#include "aster/db/db.h"
-
-aster::Db::Options options;
-options.dimension = 384;
-options.metric = aster::Metric::kCosine;
-options.data_dir = "/var/lib/my-app/aster";
-
-auto opened = aster::Db::Open(options);
-if (!opened.ok()) {
-  return ReportError(opened.status());
-}
-
-std::unique_ptr<aster::Db> db = std::move(opened.value());
-```
-
 HTTP is useful when there are multiple consumers. In-process storage is useful
 when there are not. Neither should force the other.
 
@@ -128,12 +110,6 @@ The trade-off is ordinary: less memory means less precision. There is no
 encoding that makes that go away. But it is useful to be able to make the
 choice at the collection boundary rather than changing the whole system.
 
-```cpp
-aster::Db::Options options;
-options.dimension = 512;
-options.vector_encoding = aster::VectorEncoding::kInt8Sq;
-```
-
 Search has the same shape. Exact search checks every vector and is the clean
 reference answer. HNSW checks a promising part of the collection and is much
 cheaper at scale, but approximate. Applications can decide how hard to search:
@@ -156,7 +132,7 @@ not exist.
 The long-term direction for Aster is eventual consistency across nodes without
 turning a small deployment into a complicated one. That is a goal, not a claim
 about the current release. Today, the stable surface is durable single-node
-storage, HTTP and Thrift servers, HNSW search, and an embedded C++ API.
+storage, HTTP and Thrift servers, HNSW search, and an embedded API.
 
 Replication and client package publishing are still ahead. I would rather keep
 that boundary clear than call the project distributed because it contains a
