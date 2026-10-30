@@ -387,10 +387,10 @@ main {
 
 .post-body pre {
     background: var(--code-bg) !important;
-    padding: 24px;
+    padding: 20px 24px;
     border-radius: 12px;
     overflow-x: auto;
-    margin: 32px 0;
+    margin: 24px 0;
     border: 1px solid var(--border);
     line-height: 1.5;
 }
