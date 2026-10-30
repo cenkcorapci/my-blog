@@ -1,72 +1,143 @@
 ---
-title: Building Aster: A Practical Vector Database
+title: Building Aster: A Vector Database for the Rest of Us
 date: 2026-10-30
 tags: vector databases, databases, c++, machine learning
 ---
 
-# Building Aster: A Practical Vector Database
+# Building Aster: A Vector Database for the Rest of Us
 
 Most applications that use embeddings eventually need to answer a simple
-question: which of these thousands, millions, or perhaps billions of items is
-most similar to this one? The input can be a product title, a support request,
-an image, or a paragraph from a document. Once it is represented as a vector,
-the question is the same.
+question: which stored item is most similar to this one? The input can be a
+product title, a support request, an image, or a paragraph from a document.
+Once it is represented as a vector, the question is the same.
 
-The simple answer is to keep every vector in memory and compare the query with
-all of them. It is also a good answer for small datasets. But it becomes
-expensive quickly, and it does not help much with the parts that make a system
-useful in production: surviving a restart, deleting old data, observing what
-is happening, and running on something smaller than a large server.
+The usual answer is to reach for a distributed system with a long configuration
+file, several containers, and resource requirements that make sense for a large
+team. That is a good answer for some problems. But most teams do not need that
+level of machinery. They need a small, reliable component that can store
+vectors, survive a restart, and be simple to install and operate.
 
-This is the problem I wanted to work on with [Aster](https://github.com/cenkcorapci/Aster), a CPU-first vector database written in C++20.
+That is why I am building [Aster](https://github.com/cenkcorapci/Aster), a
+CPU-first vector database written in C++20. Its target is the part of the
+market where simplicity and low resource usage matter more than a feature
+checklist: embedded applications, local tools, edge devices, and small
+services.
 
-## What “practical” means here
+## A database should not require a platform team
 
-Aster can run as an embedded library inside a C++ application, as a local HTTP
-service, or as a server. It has a durable write-ahead log and SSTables, while
-also keeping a vector index for similarity search. In other words, the vector
-index is not treated as a temporary cache that has to be rebuilt from an
-external database after every restart.
+The first useful workflow should be boring. Install Aster, start it with a
+data directory, and use an HTTP API:
 
-The write path follows a familiar pattern:
+```bash
+curl -fsSL https://raw.githubusercontent.com/cenkcorapci/Aster/main/scripts/install.sh | sh
 
-1. A write first goes into a memtable and, when a data directory is configured,
-   is persisted to the WAL.
-2. A flush creates an immutable SSTable segment together with its vector index.
+aster serve --data-dir "$HOME/.local/share/aster" --port 8080
+```
+
+Creating a collection, writing a document, and searching it is intentionally
+just a few requests:
+
+```bash
+curl -X PUT http://localhost:8080/v1/collections/docs \
+  -H 'Content-Type: application/json' \
+  -d '{"dimension":3,"metric":"cosine"}'
+
+curl -X PUT http://localhost:8080/v1/collections/docs/docs/getting-started \
+  -H 'Content-Type: application/json' \
+  -d '{"vector":[0.1,0.2,0.3],"metadata":"hello"}'
+
+curl -X POST http://localhost:8080/v1/collections/docs/search \
+  -H 'Content-Type: application/json' \
+  -d '{"vector":[0.1,0.2,0.3],"top_k":5}'
+```
+
+This is not meant to replace every large-scale vector platform. It is meant to
+remove the point at which a team is forced to adopt one before its problem
+actually demands it.
+
+## Small does not mean disposable
+
+Keeping every vector in memory and comparing a query with all of them is a
+perfectly reasonable starting point. But it does not help with the things that
+make a database dependable: surviving a restart, removing old data, observing
+the system, and recovering cleanly from an interrupted write.
+
+Aster combines a vector index with a familiar durable storage lifecycle:
+
+1. A write enters a memtable and, when a data directory is configured, is
+   persisted to a write-ahead log.
+2. A flush creates an immutable SSTable segment and its vector index.
 3. Compaction merges segments and removes obsolete entries and tombstones.
 
-This is not a new storage idea. LSM trees have been used for a long time
-because they give a useful balance between write throughput and durable,
-ordered files. The interesting part is applying the same lifecycle to vectors
-and their indexes. A search may need to look at multiple segments, but the
-database can still keep writes, flushes, and compactions predictable.
+This is the kind of unglamorous work that matters. The aim is to bring the
+operational robustness associated with systems such as Cassandra to a much
+smaller deployment model: durable logs, immutable files, explicit compaction,
+and recovery instead of an in-memory index that has to be reconstructed after
+every restart.
 
-## Exact search is useful, approximate search is necessary
+The longer-term distributed direction is eventual consistency with the same
+resource-conscious mindset. Aster should be able to make a pragmatic
+availability and consistency trade-off when a workload needs more than one
+node, without making clustering the price of getting started. Today, the
+stable release focuses on durable single-node storage; replication is a planned
+step rather than a feature to pretend already exists.
 
-For a query vector \(q\), exact search calculates its distance to every stored
-vector \(x\). Depending on the collection, Aster can use cosine distance or
-other supported metrics. This gives us a clean reference point: exact results
-are what we want, but they are not always what we can afford.
+## Run it where the application runs
 
-For larger collections, Aster uses per-segment HNSW indexes. HNSW is an
-approximate nearest-neighbour algorithm. Instead of comparing a query with
-every vector, it traverses a graph and investigates the most promising
-neighbourhoods. The important word is *approximate*: we gain speed by accepting
-that a result may not be the mathematically closest vector.
+Sometimes HTTP is the right boundary. Sometimes it is an unnecessary process
+and an unnecessary deployment. Aster also exposes a stable embedded C++ API,
+so an application can own the database in-process:
 
-There is no universally correct setting for this trade-off. A product matching
-workflow may prefer higher recall because missing a viable candidate is costly.
-A recommendation feature may prioritize latency. That is why search parameters
-such as `top_k` and `ef_search` are request-level controls in Aster rather than
-fixed deployment choices.
+```cpp
+#include "aster/db/db.h"
 
-## Memory is part of the design
+aster::Db::Options options;
+options.dimension = 384;
+options.metric = aster::Metric::kCosine;
+options.data_dir = "/var/lib/my-app/aster";
+
+auto opened = aster::Db::Open(options);
+if (!opened.ok()) {
+  return ReportError(opened.status());
+}
+
+std::unique_ptr<aster::Db> db = std::move(opened.value());
+```
+
+The same codebase has a tiny in-memory profile for constrained targets, smaller
+edge defaults for single-board computers, and a full server profile. The goal
+is not to claim that an Arduino should host a huge semantic-search corpus. It
+is to make the core database small enough to run there when an application only
+needs a small local index.
+
+## Search is a trade-off, not a magic trick
+
+Exact search compares a query vector with every stored vector. It provides the
+reference answer, but becomes expensive as collections grow. For larger
+collections, Aster uses per-segment HNSW indexes. HNSW navigates a graph of
+likely neighbours rather than comparing every vector, trading a small amount
+of recall for much lower search cost.
+
+There is no universally correct setting. A product-matching workflow may
+prefer higher recall because missing a viable candidate is costly. A
+recommendation feature may prioritize latency. Aster makes that trade-off
+visible through request-level controls such as `top_k` and `ef_search`, rather
+than hiding it behind a fixed deployment decision.
+
+```json
+{
+  "vector": [0.1, 0.2, 0.3],
+  "top_k": 10,
+  "ef_search": 128
+}
+```
+
+## Memory is also a product decision
 
 Vectors are deceptively large. Two hundred thousand 512-dimensional float32
 vectors need roughly 410 MiB just for their values, before considering the
 index, metadata, or the rest of the application. This is manageable on a
-server, but it changes the conversation for an edge device or an embedded
-deployment.
+server, but it changes the conversation for an edge device.
 
 Aster keeps the write path as float32, then offers compact encodings for
 sealed segments:
@@ -79,39 +150,29 @@ sealed segments:
 | binary RaBitQ-style encoding | 13.6 MiB |
 
 These are not free savings. Lower-precision representations affect recall and
-may require a higher search effort. The point is to make the trade-off
-explicit. A cold collection with a strict memory budget has different needs
-than a small, high-value collection where fidelity is more important.
+may require a higher search effort. The important part is that the trade-off is
+available to the application:
 
-## A small interface, but not a toy
+```cpp
+aster::Db::Options options;
+options.dimension = 512;
+options.vector_encoding = aster::VectorEncoding::kInt8Sq;
+```
 
-The first useful workflow should not require operating a cluster. Aster can
-start a local HTTP server, create a collection with a chosen dimension and
-metric, accept vectors, and search them. It also exposes collection statistics,
-health information, and Prometheus metrics because a database that cannot be
-observed is difficult to trust.
-
-For applications that do not need a separate service, the stable
-`aster::Db` interface can be linked directly into a C++ application. This
-matters for local tools and deployments where running another process would be
-unnecessary overhead.
-
-The project also has profiles for different targets: a tiny in-memory build
-with exact search, smaller edge defaults, and a full server profile. The goal
-is not to claim that one binary is optimal everywhere. It is to keep the core
-model useful when the hardware and operational constraints are different.
+A cold collection with a strict memory budget has different needs from a small,
+high-value collection where fidelity is more important. Aster should let a team
+choose that boundary without changing databases.
 
 ## What comes next
 
 Building a vector database is less about inventing a new distance function and
 more about making many ordinary decisions fit together: storage formats,
 recovery, compaction, index quality, API behaviour, and memory use. Aster is
-now at its first stable release, with durable single-node storage, HTTP and
-Thrift servers, HNSW search, and an embedded C++ API.
+at its first stable release with durable single-node storage, HTTP and Thrift
+servers, HNSW search, and an embedded C++ API.
 
-There is still a lot to do. Client package publishing, replication, and
-production-ready object-store authentication are deliberately separate pieces
-of work. Keeping these boundaries visible is more useful than pretending a
+There is still a lot to do, especially client package publishing and
+replication. Keeping those boundaries visible is more useful than pretending a
 database is complete because it can return a nearest neighbour.
 
 You can find the source code, examples, and design documentation in the
