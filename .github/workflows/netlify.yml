@@ -16,7 +16,7 @@ jobs:
                   go-version: "1.21"
 
             - name: Build Static Site
-              run: go run main.go -static
+              run: go run main.go -dist dist
 
             - name: Deploy to Netlify
               uses: netlify/actions/cli@master
