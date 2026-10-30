@@ -1,28 +1,29 @@
 ---
-title: Building Aster: A Vector Database for the Rest of Us
+title: Building Aster: Local Vector Search Without a Platform
 date: 2026-10-30
 tags: vector databases, databases, machine learning
 ---
 
-# Building Aster: A Vector Database for the Rest of Us
+# Building Aster: Local Vector Search Without a Platform
 
-There is a familiar pattern in software. A team has a small problem, finds a
-tool built for a much bigger problem, and then spends the next year operating
-the tool.
+I am building [Aster](https://github.com/cenkcorapci/Aster) for applications
+that need vector search but do not need a data platform.
 
-Vector search seems especially prone to this. Suppose you have a few hundred
-thousand product titles, support tickets, or documents. You embed them, then
-you want to find the nearest ones for each new item. It is tempting to begin
-with a distributed vector database, a Kubernetes cluster, and a long list of
-things to tune. Sometimes that is the right answer. Usually it is not.
+The useful case is fairly ordinary. An application has documents, product
+titles, support tickets, or images. It turns them into vectors and needs to
+find the nearest ones for a query. If the collection fits on one machine and
+the application does not need multi-node replication, adding a cluster is
+usually extra work rather than an advantage.
 
-I am building [Aster](https://github.com/cenkcorapci/Aster) for the other
-cases: applications that need vector search, but do not need a data platform.
-It is a CPU-first vector database that can run as a small HTTP service or
-inside an application. The intended experience is closer to adding a local
-database than adopting a new piece of infrastructure.
+Aster is intended to run next to the application: as a local HTTP service or
+in-process. It is also designed for constrained targets, from a small
+in-memory profile to edge and server profiles. The small profile is useful for
+an embedded local index; it is not a claim that an Arduino should host a large
+semantic-search corpus.
 
-The basic setup should look like this:
+## What using it looks like
+
+The current single-node HTTP workflow is deliberately short:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cenkcorapci/Aster/main/scripts/install.sh | sh
@@ -30,7 +31,8 @@ curl -fsSL https://raw.githubusercontent.com/cenkcorapci/Aster/main/scripts/inst
 aster serve --data-dir "$HOME/.local/share/aster" --port 8080
 ```
 
-Then create a collection, write a vector, and search it:
+Create a collection with a fixed vector dimension and metric, then add and
+search documents:
 
 ```bash
 curl -X PUT http://localhost:8080/v1/collections/docs \
@@ -46,101 +48,68 @@ curl -X POST http://localhost:8080/v1/collections/docs/search \
   -d '{"vector":[0.1,0.2,0.3],"top_k":5}'
 ```
 
-That is not a clever interface. It is deliberately not clever.
+Cosine is generally the appropriate metric when the embedding model produces
+normalized vectors. The collection dimension must match the embedding model's
+output. Those two choices are made once for a collection, so they are worth
+deciding before loading data.
 
-## The thing I do not want to give up
+## What happens to a write
 
-Simple does not have to mean disposable. A process that holds an HNSW index in
-memory can be very fast, but it is not yet a database. It needs to survive a
-restart. It needs a reasonable answer to an interrupted write. It needs to
-remove deleted values eventually, rather than collecting them forever.
+With a data directory, Aster uses an LSM-style storage path:
 
-Aster uses a write-ahead log, memtables, immutable SSTable segments, and
-compaction. The sequence is not particularly original:
+1. It records the write in a write-ahead log (WAL) and adds it to an in-memory
+   memtable.
+2. A flush writes the memtable as an immutable SSTable segment.
+3. Compaction merges segments and eventually removes values superseded by
+   updates or deletes.
 
-1. A write is added to a memtable and persisted to a WAL when a data directory
-   is configured.
-2. A flush turns that mutable state into an immutable segment with its vector
-   index.
-3. Compaction merges segments and removes values that are no longer current.
+The reason for this shape is not novelty. It makes the crash story manageable:
+on startup, Aster reads its segment manifest and replays WAL entries that have
+not yet been flushed. The [write-ahead log primer](/post/why-a-vector-database-needs-a-write-ahead-log/)
+explains the terms and the recovery path in more detail.
 
-This is the part of databases that I find more interesting than the search
-algorithm. HNSW is useful, but a database mostly earns its place on the system
-diagram by behaving sensibly at inconvenient times.
+This is the part of the project that matters most to me. A local vector index
+is useful. A local vector index that can lose recent writes after a restart is
+much less useful.
 
-The resilience target is informed by systems such as Cassandra: append durable
-data first, use immutable files, and make recovery and cleanup explicit. I do
-not mean that a small local vector database should be a drop-in replacement for
-Cassandra. It should borrow the habits that make Cassandra boring in the good
-sense.
+## How search works
 
-## Where the small part matters
+Exact search compares a query with every vector. It is the reference answer
+and is a good fit for small collections. It is also Aster's baseline: every
+approximate index is measured against exact search.
 
-Most vector databases are comfortable assuming a server with plenty of RAM.
-That is fine until the vector store is part of an application that runs on a
-single-board computer, a local tool, or a constrained edge machine.
+For larger collections, Aster's design uses one HNSW graph per immutable
+segment. HNSW trades a small amount of recall for fewer distance calculations.
+The [HNSW primer](/post/hnsw-for-vector-search/) explains the graph and its
+`ef_search` trade-off without assuming that it is magic.
 
-The same Aster codebase has a tiny in-memory profile, smaller edge defaults,
-and a full server profile. The tiny profile can run on an Arduino-class target.
-This does not mean an Arduino is now a semantic-search cluster. It means a
-small local index can be treated as a normal part of an embedded application
-instead of an excuse to add a separate service.
+The HNSW implementation work is recorded as complete, but its recall and
+latency gate is still pending verification. That is an important distinction:
+the single-node storage path is useful today; HNSW should not be treated as a
+finished performance promise until those measurements are published.
 
-HTTP is useful when there are multiple consumers. In-process storage is useful
-when there are not. Neither should force the other.
+## Where resource use enters the picture
 
-## Vectors take more space than they look like
+A 512-dimensional float32 vector uses 2 KiB. That sounds small until there
+are 200,000 of them: the vector values alone then require about 410 MB,
+before metadata and indexing.
 
-A 512-dimensional float32 vector is only 2 KiB. That sounds small. Two hundred
-thousand of them are roughly 410 MiB before the index, metadata, or the rest
-of the application. This is the point at which a simple choice starts having
-real consequences.
+Aster can compact sealed segments with lower-precision encodings. Float16,
+int8 scalar quantization, and a binary RaBitQ-style encoding reduce RAM and
+disk use at the cost of precision. The correct choice depends on the
+collection: a cold collection with a fixed memory budget may accept lower
+recall; a small, high-value collection may not.
 
-Aster writes float32 vectors to its active write path, then supports compact
-representations in sealed segments:
+## What Aster is not yet
 
-| Encoding | Approximate payload at 200k × 512 |
-| --- | ---: |
-| float32 | 409.6 MiB |
-| float16 | 204.8 MiB |
-| int8 scalar quantization | 103.2 MiB |
-| binary RaBitQ-style encoding | 13.6 MiB |
+The intended destination is an eventually consistent, peer-to-peer database
+with tunable replication. That is not the current product boundary.
 
-The trade-off is ordinary: less memory means less precision. There is no
-encoding that makes that go away. But it is useful to be able to make the
-choice at the collection boundary rather than changing the whole system.
+Today, use Aster when one durable node, local deployment, or an embedded index
+is the problem. Do not select it for production replication, multi-node
+failover, or published client packages; those areas are still in development.
+Keeping that distinction explicit is more useful than calling an unfinished
+feature a platform.
 
-Search has the same shape. Exact search checks every vector and is the clean
-reference answer. HNSW checks a promising part of the collection and is much
-cheaper at scale, but approximate. Applications can decide how hard to search:
-
-```json
-{
-  "vector": [0.1, 0.2, 0.3],
-  "top_k": 10,
-  "ef_search": 128
-}
-```
-
-For product matching, missing a good candidate might be more expensive than a
-few extra milliseconds. For a recommendation widget, the opposite might be
-true. The database should expose that decision instead of pretending it does
-not exist.
-
-## One node first, more when it is needed
-
-The long-term direction for Aster is eventual consistency across nodes without
-turning a small deployment into a complicated one. That is a goal, not a claim
-about the current release. Today, the stable surface is durable single-node
-storage, HTTP and Thrift servers, HNSW search, and an embedded API.
-
-Replication and client package publishing are still ahead. I would rather keep
-that boundary clear than call the project distributed because it contains a
-ring implementation.
-
-The project is small on purpose. The best outcome is not that every team uses
-Aster. It is that a team with a modest vector-search problem can use it without
-first acquiring the operational burden of a much larger system.
-
-The code, API examples, and design documents are in the
+The code, API examples, and implementation status are in the
 [Aster repository](https://github.com/cenkcorapci/Aster).

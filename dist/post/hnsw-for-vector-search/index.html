@@ -1,0 +1,72 @@
+<!doctype html><html data-theme=dark><script>
+    (function () {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else {
+            const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', preferDark ? 'dark' : 'light');
+        }
+    })();
+</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>HNSW for Vector Search, Briefly - Cenk Corapci</title><meta name=description content="HNSW for Vector Search, Briefly - A blog post by Cenk Corapci"><link rel=canonical href=https://cenkcorapci.com/post/hnsw-for-vector-search/><meta property="og:type" content="article"><meta property="og:url" content="https://cenkcorapci.com/post/hnsw-for-vector-search/"><meta property="og:title" content="HNSW for Vector Search, Briefly"><meta property="og:description" content="HNSW for Vector Search, Briefly - A blog post by Cenk Corapci"><meta property="og:image" content="https://cenkcorapci.com/static/og-image.png"><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://cenkcorapci.com/post/hnsw-for-vector-search/"><meta property="twitter:title" content="HNSW for Vector Search, Briefly"><meta property="twitter:description" content="HNSW for Vector Search, Briefly - A blog post by Cenk Corapci"><meta property="twitter:image" content="https://cenkcorapci.com/static/og-image.png"><link rel=stylesheet href=/static/style.css><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError : false
+        });"></script><script src=/static/search.js defer></script><link rel=preload href=/search-index.json as=fetch crossorigin><header><div class=container><nav><h1><a href=/>Cenk Corapci</a></h1><ul class=nav-links><li><a href=https://linkedin.com/in/cenkcorapci target=_blank>LinkedIn</a><li class=github-button-item><a class=github-button href=https://github.com/cenkcorapci/my-blog data-icon=octicon-repo-forked data-size=large aria-label="Fork https://github.com/cenkcorapci/my-blog on GitHub">Fork</a><li><button id=theme-toggle class=theme-toggle aria-label="Toggle theme">
+<svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+<svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg></button></ul></nav></div></header><main class=container><article class=post-content><header class=post-header><time datetime=2026-10-29>October 29, 2026</time><div class=post-tags style=margin-top:10px><a href="/search/?q=vector%20databases" class=tag>vector databases</a>
+<a href="/search/?q=hnsw" class=tag>hnsw</a>
+<a href="/search/?q=machine%20learning" class=tag>machine learning</a></div></header><div class=post-body><h1 id=hnsw-for-vector-search-briefly>HNSW for Vector Search, Briefly</h1><p>Nearest-neighbour search has an obvious implementation: compare a query vector<br>with every stored vector and return the closest results. It is exact, simple,<br>and eventually expensive.<p>If a collection has (N) vectors of dimension (d), that scan does work<br>proportional to (N \times d) for every query. It is often fine for small<br>collections. It becomes a poor default when queries must stay fast as (N)<br>grows.<p>HNSW, short for <em>Hierarchical Navigable Small World</em>, is one way to avoid<br>looking everywhere.<h2 id=the-graph>The graph</h2><p>HNSW stores vectors in a graph. Nearby vectors are connected. A query begins<br>at a sparse upper layer, where long jumps get it near the right part of the<br>space, then descends through denser layers until it searches the bottom layer<br>for the best candidates.<p>The result is approximate. HNSW may miss a true nearest neighbour, but it<br>usually needs far fewer distance calculations than an exhaustive scan.<p>Two parameters matter most:<ul><li><code>M</code> limits how many neighbours a node keeps. It affects graph size and<br>quality.<li><code>ef_search</code> controls how many candidates a query considers at the dense<br>layer. Raising it usually improves recall and increases query cost.</ul><p>There is no setting that is correct for every application. A product-matching<br>workflow may spend more CPU to avoid missing candidates. A recommendation<br>endpoint may accept lower recall for a tighter latency budget.<h2 id=why-one-graph-per-segment>Why one graph per segment</h2><p>A single mutable HNSW graph is inconvenient for a write-heavy database. Adding<br>a vector changes graph links; deleting one leaves holes; recovery after an<br>interrupted graph update needs careful handling.<p>The design used by <a href=/post/building-aster-a-practical-vector-database/>Aster</a><br>is different: a flushed, immutable storage segment owns its own graph. New<br>writes are handled separately. A search gathers candidates from each segment,<br>reconciles newer values and deletes, then returns the best remaining results.<br>Compaction merges old segments and builds a new graph for the merged data.<p>This keeps graph construction away from the write path and makes immutable<br>storage do some useful work. It also means the number of segments matters:<br>too many segments make one query search too many graphs, so compaction is part<br>of search performance.<h2 id=the-status-in-aster>The status in Aster</h2><p>Exact search is Aster's correctness baseline. Its segmented-HNSW<br>implementation is still awaiting its recall and latency verification gate.<br>That is the right time to be precise about what HNSW provides: not a guarantee<br>of the exact top results, but a measurable recall/latency trade-off.<p>For the surrounding storage and recovery model, see<br><a href=/post/why-a-vector-database-needs-a-write-ahead-log/>Why a Vector Database Needs a Write-Ahead Log</a>.</div></article></main><script>
+        const toggleBtn = document.getElementById('theme-toggle');
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.add('theme-transitioning');
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            
+            setTimeout(() => {
+                document.body.classList.remove('theme-transitioning');
+            }, 300);
+        });
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a').forEach(link => {
+                const url = link.getAttribute('href');
+                if (url && url.startsWith('/') && !url.includes('#')) {
+                    link.addEventListener('mouseenter', () => {
+                        if (!document.querySelector(`link[href="${url}"]`)) {
+                            const l = document.createElement('link');
+                            l.rel = 'prefetch';
+                            l.href = url;
+                            document.head.appendChild(l);
+                        }
+                    }, { once: true });
+                }
+            });
+        });
+    </script><script async defer src=https://buttons.github.io/buttons.js></script>
