@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-const { renderBenchmarkChart } = require('./aster-charts');
+const { renderBenchmarkChart, renderBenchmarkComparison } = require('./aster-charts');
 
 test('renders log-scale series and points from the accessible data table', () => {
     document.body.innerHTML = `
@@ -27,6 +27,30 @@ test('leaves invalid or missing benchmark tables alone', () => {
     document.body.innerHTML = '<h4 id="test-chart">Benchmark</h4><table><thead><tr><th>Size</th><th>Value</th></tr></thead><tbody><tr><td>10</td><td>unknown</td></tr></tbody></table>';
     renderBenchmarkChart('missing');
     renderBenchmarkChart('test-chart');
+    expect(document.querySelector('.benchmark-chart')).toBeNull();
+    expect(document.querySelector('table')).not.toBeNull();
+});
+
+test('renders independently scaled comparison bars while retaining the table', () => {
+    document.body.innerHTML = `
+        <h4 id="comparison">Comparison</h4><p>Conditions</p>
+        <table><thead><tr><th>Metric</th><th>1.0.1</th><th>1.0.2</th></tr></thead>
+        <tbody><tr><td>Latency</td><td>100</td><td>25</td></tr>
+            <tr><td>Throughput</td><td>2</td><td>8</td></tr></tbody></table>`;
+    renderBenchmarkComparison('comparison');
+    const chart = document.querySelector('.benchmark-chart');
+    expect(chart.getAttribute('aria-hidden')).toBe('true');
+    expect(chart.textContent).toContain('1.0.2');
+    expect(Array.from(chart.querySelectorAll('rect')).map(bar => bar.getAttribute('width')))
+        .toEqual(['440', '110', '110', '440']);
+    expect(document.querySelector('table')).not.toBeNull();
+});
+
+test('does not render a comparison with invalid values', () => {
+    document.body.innerHTML = `<h4 id="comparison">Comparison</h4>
+        <table><thead><tr><th>Metric</th><th>Old</th><th>New</th></tr></thead>
+        <tbody><tr><td>Latency</td><td>unknown</td><td>1</td></tr></tbody></table>`;
+    renderBenchmarkComparison('comparison');
     expect(document.querySelector('.benchmark-chart')).toBeNull();
     expect(document.querySelector('table')).not.toBeNull();
 });

@@ -64,12 +64,57 @@ function renderBenchmarkChart(headingId) {
     table.before(svg);
 }
 
+function renderBenchmarkComparison(headingId) {
+    const heading = document.getElementById(headingId);
+    let table = heading && heading.nextElementSibling;
+    while (table && table.tagName !== 'TABLE' && !/^H[1-6]$/.test(table.tagName)) {
+        table = table.nextElementSibling;
+    }
+    if (!table || table.tagName !== 'TABLE') return;
+
+    const versions = Array.from(table.querySelectorAll('thead th')).slice(1)
+        .map(cell => cell.textContent.trim());
+    const rows = Array.from(table.querySelectorAll('tbody tr')).map(row =>
+        Array.from(row.querySelectorAll('td')).map(cell => cell.textContent.trim())
+    );
+    if (versions.length !== 2 || !rows.length || rows.some(row =>
+        row.length !== 3 || row.slice(1).some(value => !Number.isFinite(Number(value)) ||
+            Number(value) < 0) || Math.max(...row.slice(1).map(Number)) <= 0)) return;
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', `0 0 720 ${rows.length * 94}`);
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('benchmark-chart');
+    const add = (tag, attrs, text) => {
+        const element = document.createElementNS(ns, tag);
+        Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+        if (text !== undefined) element.textContent = text;
+        svg.appendChild(element);
+    };
+    rows.forEach((row, i) => {
+        const top = i * 94;
+        const max = Math.max(...row.slice(1).map(Number));
+        add('text', { x: 0, y: top + 16 }, row[0]);
+        row.slice(1).forEach((value, j) => {
+            const y = top + 26 + j * 29;
+            const width = Number(value) / max * 440;
+            add('text', { x: 0, y: y + 15 }, versions[j]);
+            add('rect', { x: 90, y, width, height: 18,
+                class: `benchmark-comparison-bar benchmark-series-${j}` });
+            add('text', { x: 100 + width, y: y + 15 }, value);
+        });
+    });
+    table.before(svg);
+}
+
 if (typeof document !== 'undefined') {
     [
         'peak-process-rss-by-index-size',
         'exact-search-latency-by-index-size',
         'exact-search-throughput-by-index-size'
     ].forEach(renderBenchmarkChart);
+    renderBenchmarkComparison('aster-102-10-million-vector-comparison');
 }
 
-if (typeof module !== 'undefined') module.exports = { renderBenchmarkChart };
+if (typeof module !== 'undefined') module.exports = { renderBenchmarkChart, renderBenchmarkComparison };

@@ -446,11 +446,13 @@ main {
 }
 
 .benchmark-point.benchmark-series-0,
+.benchmark-comparison-bar.benchmark-series-0,
 .benchmark-legend.benchmark-series-0 {
     fill: #64a7f5;
 }
 
 .benchmark-point.benchmark-series-1,
+.benchmark-comparison-bar.benchmark-series-1,
 .benchmark-legend.benchmark-series-1 {
     fill: #b692f6;
 }

@@ -155,6 +155,39 @@ deciding before loading data.
 
 ### What the numbers look like
 
+#### Aster 1.0.2: 10-million-vector comparison
+
+After profiling the exact scan, [Aster 1.0.2](https://github.com/cenkcorapci/Aster/releases/tag/v1.0.2)
+added an ARM64 NEON kernel for packed int8 L2 scoring and bounded parallel
+scanning for large, unfiltered searches across multiple exact int8 segments.
+The scan still scores every vector; it is not an approximate index.
+
+The following is a like-for-like comparison of optimized (`-c opt`) builds
+on the same Apple M4 with 32 GiB RAM and macOS 26.6.2. Each run used 10 million
+synthetic normalized 384-dimensional vectors, `int8_sq`, L2, cold mmap, WAL
+sync disabled, and HNSW background building off. After reopening, the harness
+ran 20 sequential top-10 searches, including the first query.
+
+| Metric | 1.0.1 | 1.0.2 |
+| --- | ---: | ---: |
+| Search p50 (ms) | 2100.474 | 256.051 |
+| Searches per second | 0.5 | 3.9 |
+| Peak process RSS (MiB) | 5790.0 | 6073.7 |
+
+The median was **8.2× lower** in this workload, with higher peak process RSS
+and up to four scan workers trading CPU concurrency for latency. The bar
+lengths are scaled separately for each metric. The shared machine was not
+isolated, and 20 queries are too few for reliable tail-latency estimates. This
+is a quantized exhaustive scan, not an ANN, HTTP, recall, or production
+capacity benchmark. Filtered searches, HNSW, other encodings, and small scans
+do not use the parallel fan-out. Different floating-point reduction order can
+slightly change scores at ties.
+
+The command and full conditions are in the
+[benchmark notes](https://github.com/cenkcorapci/Aster/blob/v1.0.2/docs/ram-efficiency.md#large-exact-scan-benchmark-2026-11-20).
+
+#### Historical fastbuild measurements by index size
+
 These are measurements, not capacity promises. I ran the same single-node
 durable stress harness at different collection sizes on an Apple M4 with
 32 GiB RAM and macOS 26.6.2 on November 20, 2026. Each run used
@@ -164,6 +197,8 @@ background building was **off**.
 This was the existing Bazel `fastbuild` binary, not an optimized production
 build, from Aster revision
 [`1710c88`](https://github.com/cenkcorapci/Aster/tree/1710c88).
+These historical charts are not the optimized 1.0.2 results above and should
+not be used to calculate the speedup.
 The search loop starts after reopen and includes its first query;
 these are not separate cold-start measurements. The machine was not isolated
 from other work.
