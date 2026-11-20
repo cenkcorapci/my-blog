@@ -115,6 +115,7 @@ if (typeof document !== 'undefined') {
         'exact-search-throughput-by-index-size'
     ].forEach(renderBenchmarkChart);
     renderBenchmarkComparison('aster-102-10-million-vector-comparison');
+    renderBenchmarkComparison('aster-103-another-10-million-vector-improvement');
 }
 
 if (typeof module !== 'undefined') module.exports = { renderBenchmarkChart, renderBenchmarkComparison };

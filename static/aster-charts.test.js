@@ -54,3 +54,13 @@ test('does not render a comparison with invalid values', () => {
     expect(document.querySelector('.benchmark-chart')).toBeNull();
     expect(document.querySelector('table')).not.toBeNull();
 });
+
+test('automatically renders the 1.0.3 comparison', () => {
+    document.body.innerHTML = `<h4 id="aster-103-another-10-million-vector-improvement">1.0.3</h4>
+        <p>Conditions</p><table>
+        <thead><tr><th>Metric</th><th>1.0.2</th><th>1.0.3</th></tr></thead>
+        <tbody><tr><td>Latency</td><td>252.060</td><td>214.753</td></tr></tbody></table>`;
+    jest.isolateModules(() => require('./aster-charts'));
+    expect(document.querySelectorAll('.benchmark-comparison-bar')).toHaveLength(2);
+    expect(document.querySelector('table')).not.toBeNull();
+});

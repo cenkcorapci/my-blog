@@ -155,6 +155,35 @@ deciding before loading data.
 
 ### What the numbers look like
 
+#### Aster 1.0.3: another 10-million-vector improvement
+
+[Aster 1.0.3](https://github.com/cenkcorapci/Aster/releases/tag/v1.0.3)
+converts the query to double once per segment instead of once per vector in
+optimized ARM64 int8 L2 exact scans. The calculation still scans every vector
+and accumulates distances in double precision.
+
+On the same Apple M4 host and 10-million-vector workload described below,
+optimized builds of 1.0.2 and 1.0.3 each ran 30 sequential top-10 searches
+after reopen, including the first query:
+
+| Metric | 1.0.2 | 1.0.3 |
+| --- | ---: | ---: |
+| Search p50 (ms) | 252.060 | 214.753 |
+| Searches per second | 3.9 | 4.7 |
+| Peak process RSS (MiB) | 5880.5 | 5574.1 |
+
+That is **14.8% lower median latency** in this run. Repeating the comparison
+in reverse order gave 270.200 ms versus 219.680 ms (18.7% lower), with
+3.7 versus 4.5 searches per second. Both comparisons had zero reported
+search errors. Bars are scaled separately for each metric; peak RSS includes
+loading and caching and does not demonstrate a memory reduction.
+
+These are quantized exhaustive scans with HNSW disabled, not ANN or HTTP
+benchmarks. The host was shared and 30 queries per run are too few to
+characterize tail latency or production capacity. The benchmark did not
+measure recall. See the [benchmark notes](https://github.com/cenkcorapci/Aster/blob/v1.0.3/docs/ram-efficiency.md#103-prepared-query-for-packed-exact-scans)
+for the settings and reproduction command.
+
 #### Aster 1.0.2: 10-million-vector comparison
 
 After profiling the exact scan, [Aster 1.0.2](https://github.com/cenkcorapci/Aster/releases/tag/v1.0.2)
