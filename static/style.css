@@ -413,6 +413,74 @@ main {
     margin-bottom: 8px;
 }
 
+.benchmark-chart {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+
+.benchmark-chart-group + .benchmark-chart-group {
+    margin-top: 16px;
+}
+
+.benchmark-chart-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.benchmark-chart-row {
+    display: grid;
+    grid-template-columns: minmax(70px, 120px) 1fr;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.benchmark-chart-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.benchmark-chart-bar {
+    height: 12px;
+    min-width: 2px;
+    border-radius: 3px;
+    background: #64a7f5;
+}
+
+.benchmark-chart-row:nth-child(3) .benchmark-chart-bar {
+    background: #b692f6;
+}
+
+.benchmark-chart-row:nth-child(4) .benchmark-chart-bar {
+    background: #e6a76a;
+}
+
+.benchmark-chart-value {
+    white-space: nowrap;
+}
+
+.post-body table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 20px 0 24px;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.post-body th,
+.post-body td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
 .post-nav {
     margin-top: 64px;
     border-top: 1px solid var(--border);

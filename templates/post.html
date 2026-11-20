@@ -49,6 +49,9 @@
             throwOnError : false
         });"></script>
     <script src="/static/search.js" defer></script>
+    {{if eq .Post.Slug "building-aster-a-practical-vector-database"}}
+    <script src="/static/aster-charts.js" defer></script>
+    {{end}}
     <link rel="preload" href="/search-index.json" as="fetch" crossorigin>
 </head>
 

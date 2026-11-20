@@ -153,6 +153,69 @@ normalized vectors. The collection dimension must match the embedding model's
 output. Those two choices are made once for a collection, so they are worth
 deciding before loading data.
 
+### What the numbers look like
+
+These are measurements, not capacity promises. I ran the same single-node
+durable stress harness at three collection sizes on an Apple M4 with macOS
+26.6.2 on November 20, 2026. Each run used 384-dimensional vectors,
+`int8_sq`, cold mmap, WAL sync disabled, and 100 exact top-10 searches after
+reopening. HNSW background building was **off**. This was the existing Bazel
+`fastbuild` binary, not an optimized production build. The search loop starts
+after reopen and includes its first query; these are not separate cold-start
+measurements. The machine was not isolated from other work.
+
+#### Peak process RSS by index size
+
+| Vectors | Peak RSS (MiB) |
+| --- | ---: |
+| 10,000 | 64.6 |
+| 25,000 | 123.2 |
+| 50,000 | 135.7 |
+
+This is the process high-water mark over loading and searching, not steady
+state, anonymous RSS, or just the index. It includes the memtable, metadata,
+and resident mapped pages. The harness reported 0 bytes of anonymous vector
+heap for the first sealed store after reopen at each size; that is not a
+claim that the whole process uses no RAM.
+
+#### Exact search latency by index size
+
+| Vectors | p50 (ms) | p95 (ms) | p99 (ms) |
+| --- | ---: | ---: | ---: |
+| 10,000 | 7.618 | 10.529 | 20.573 |
+| 25,000 | 19.129 | 19.902 | 20.042 |
+| 50,000 | 38.151 | 38.823 | 42.017 |
+
+These percentiles describe 100 sequential exact scans, not ANN or HTTP
+latency; the p99 in particular is sensitive to individual slow queries.
+
+#### Exact search throughput by index size
+
+| Vectors | Searches per second |
+| --- | ---: |
+| 10,000 | 121.1 |
+| 25,000 | 52.1 |
+| 50,000 | 26.0 |
+
+Each size was a separate run; throughput is measured over the same search
+loop as the latency chart. Different datasets, indexing modes, hardware, and
+concurrency will produce different results.
+
+To reproduce, build the benchmark and run each size in a **disposable
+directory**: the harness deletes the directory passed to `--root`.
+
+```bash
+bazel build //aster/bench:ram_stress_bench
+bench_dir="$(mktemp -d)"
+for n in 10000 25000 50000; do
+  bazel-bin/aster/bench/ram_stress_bench --single-only --single-n "$n" \
+    --dim 384 --encoding int8_sq --searches 100 --root "$bench_dir/$n"
+done
+```
+
+More on the harness, residency metrics, and limitations is in the
+[RAM efficiency notes](https://github.com/cenkcorapci/Aster/blob/main/docs/ram-efficiency.md).
+
 ## What Aster is not yet
 
 The intended destination is an eventually consistent, peer-to-peer database
