@@ -156,13 +156,23 @@ deciding before loading data.
 ### What the numbers look like
 
 These are measurements, not capacity promises. I ran the same single-node
-durable stress harness at three collection sizes on an Apple M4 with macOS
-26.6.2 on November 20, 2026. Each run used 384-dimensional vectors,
-`int8_sq`, cold mmap, WAL sync disabled, and 100 exact top-10 searches after
-reopening. HNSW background building was **off**. This was the existing Bazel
-`fastbuild` binary, not an optimized production build. The search loop starts
-after reopen and includes its first query; these are not separate cold-start
-measurements. The machine was not isolated from other work.
+durable stress harness at different collection sizes on an Apple M4 with
+32 GiB RAM and macOS 26.6.2 on November 20, 2026. Each run used
+synthetic normalized 384-dimensional vectors, L2 distance, `int8_sq`, cold
+mmap, WAL sync disabled, and exact top-10 searches after reopening. HNSW
+background building was **off**.
+This was the existing Bazel `fastbuild` binary, not an optimized production
+build, from Aster revision
+[`1710c88`](https://github.com/cenkcorapci/Aster/tree/1710c88).
+The search loop starts after reopen and includes its first query;
+these are not separate cold-start measurements. The machine was not isolated
+from other work.
+
+The three smaller runs used 100 sequential queries each; the million-vector
+runs used only 10 each and ran at lower process priority. Their latency and
+throughput figures are rough observations, not stable tail-latency estimates.
+The horizontal axis is logarithmic so small and large collections fit on the
+same chart; the tables contain the exact plotted values.
 
 #### Peak process RSS by index size
 
@@ -171,23 +181,34 @@ measurements. The machine was not isolated from other work.
 | 10,000 | 64.6 |
 | 25,000 | 123.2 |
 | 50,000 | 135.7 |
+| 1,000,000 | 667.7 |
+| 2,000,000 | 1178.9 |
+| 5,000,000 | 2711.0 |
+| 10,000,000 | 5581.0 |
 
 This is the process high-water mark over loading and searching, not steady
 state, anonymous RSS, or just the index. It includes the memtable, metadata,
 and resident mapped pages. The harness reported 0 bytes of anonymous vector
-heap for the first sealed store after reopen at each size; that is not a
-claim that the whole process uses no RAM.
+heap for the first sealed store after reopen at each size; it does not check
+all segments and is not a claim that the whole process uses no RAM.
 
 #### Exact search latency by index size
 
-| Vectors | p50 (ms) | p95 (ms) | p99 (ms) |
-| --- | ---: | ---: | ---: |
-| 10,000 | 7.618 | 10.529 | 20.573 |
-| 25,000 | 19.129 | 19.902 | 20.042 |
-| 50,000 | 38.151 | 38.823 | 42.017 |
+| Vectors | p50 (ms) |
+| --- | ---: |
+| 10,000 | 7.618 |
+| 25,000 | 19.129 |
+| 50,000 | 38.151 |
+| 1,000,000 | 889.748 |
+| 2,000,000 | 1541.784 |
+| 5,000,000 | 3934.726 |
+| 10,000,000 | 7685.991 |
 
-These percentiles describe 100 sequential exact scans, not ANN or HTTP
-latency; the p99 in particular is sensitive to individual slow queries.
+These medians describe sequential exact scans, not ANN or HTTP latency.
+At 10,000, 25,000, and 50,000 vectors respectively, p95 was 10.529, 19.902,
+and 38.823 ms; p99 was 20.573, 20.042, and 42.017 ms. Those are based on
+100 queries per size. Ten queries at the larger sizes are too few to make a
+useful p95 or p99 claim.
 
 #### Exact search throughput by index size
 
@@ -196,13 +217,22 @@ latency; the p99 in particular is sensitive to individual slow queries.
 | 10,000 | 121.1 |
 | 25,000 | 52.1 |
 | 50,000 | 26.0 |
+| 1,000,000 | 1.1 |
+| 2,000,000 | 0.6 |
+| 5,000,000 | 0.3 |
+| 10,000,000 | 0.1 |
 
 Each size was a separate run; throughput is measured over the same search
-loop as the latency chart. Different datasets, indexing modes, hardware, and
-concurrency will produce different results.
+loop as the latency chart and rounded to one decimal place. The 10-million
+run took 544.38 seconds to load and flush and 25.497 seconds to reopen.
+The harness reported no search or write errors, but did not measure recall.
+Different datasets, indexing modes, hardware, and concurrency will produce
+different results.
 
 To reproduce, build the benchmark and run each size in a **disposable
-directory**: the harness deletes the directory passed to `--root`.
+directory**: the harness deletes the directory passed to `--root`. The larger
+runs take substantial time and memory; the 10-million-vector run used over
+4 GiB of disk.
 
 ```bash
 bazel build //aster/bench:ram_stress_bench
@@ -210,6 +240,10 @@ bench_dir="$(mktemp -d)"
 for n in 10000 25000 50000; do
   bazel-bin/aster/bench/ram_stress_bench --single-only --single-n "$n" \
     --dim 384 --encoding int8_sq --searches 100 --root "$bench_dir/$n"
+done
+for n in 1000000 2000000 5000000 10000000; do
+  nice -n 10 bazel-bin/aster/bench/ram_stress_bench --single-only --single-n "$n" \
+    --dim 384 --encoding int8_sq --searches 10 --root "$bench_dir/$n"
 done
 ```
 
