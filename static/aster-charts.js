@@ -10,6 +10,7 @@ function renderBenchmarkChart(headingId) {
     const sizes = rows.map(row => Number(row[0].replace(/,/g, '')));
     const values = rows.flatMap(row => row.slice(1).map(Number));
     const max = Math.max(...values);
+    const min = Math.min(...values);
     if (rows.length < 2 || !headers.length || !Number.isFinite(max) || max <= 0 ||
         rows.some(row => row.length !== headers.length + 1) ||
         sizes.some((size, i) => !Number.isFinite(size) || size <= 0 ||
@@ -30,14 +31,20 @@ function renderBenchmarkChart(headingId) {
     };
     const left = 75, right = 700, top = 40, bottom = 245;
     const minLog = Math.log10(sizes[0]), maxLog = Math.log10(sizes[sizes.length - 1]);
+    const logY = min > 0 && max > min;
+    const minLogY = logY ? Math.log10(min) : 0;
+    const maxLogY = logY ? Math.log10(max) : 0;
     const x = size => left + (Math.log10(size) - minLog) / (maxLog - minLog) * (right - left);
-    const y = value => bottom - value / max * (bottom - top);
+    const y = value => bottom - (logY
+        ? (Math.log10(value) - minLogY) / (maxLogY - minLogY)
+        : value / max) * (bottom - top);
 
     [0, 0.5, 1].forEach(fraction => {
-        const level = y(max * fraction);
+        const value = logY ? 10 ** (minLogY + fraction * (maxLogY - minLogY)) : max * fraction;
+        const level = y(value);
         add('line', { x1: left, y1: level, x2: right, y2: level, class: 'benchmark-grid' });
         add('text', { x: left - 10, y: level + 4, 'text-anchor': 'end' },
-            Number((max * fraction).toPrecision(3)).toLocaleString('en-US'));
+            Number(value.toPrecision(3)).toLocaleString('en-US'));
     });
     for (let power = Math.ceil(minLog); power <= Math.floor(maxLog); power++) {
         const size = 10 ** power;
@@ -46,6 +53,9 @@ function renderBenchmarkChart(headingId) {
     }
     add('text', { x: (left + right) / 2, y: 295, 'text-anchor': 'middle' },
         'Vectors (log scale)');
+    add('text', { x: 16, y: (top + bottom) / 2, 'text-anchor': 'middle',
+        transform: `rotate(-90 16 ${(top + bottom) / 2})` },
+        logY ? 'Values (log scale)' : 'Values');
     headers.forEach((header, i) => {
         const points = rows.map((row, j) => `${x(sizes[j])},${y(Number(row[i + 1]))}`).join(' ');
         add('polyline', { points, class: `benchmark-series benchmark-series-${i}` });

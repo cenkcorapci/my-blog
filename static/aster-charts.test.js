@@ -15,12 +15,26 @@ test('renders log-scale series and points from the accessible data table', () =>
     expect(chart.getAttribute('aria-hidden')).toBe('true');
     expect(chart.textContent).toContain('1,000,000 vectors');
     expect(chart.textContent).toContain('p95 (ms)');
+    expect(chart.textContent).toContain('Values (log scale)');
     expect(chart.querySelectorAll('polyline')).toHaveLength(2);
     expect(chart.querySelectorAll('circle')).toHaveLength(6);
     expect(chart.querySelectorAll('circle')[0].getAttribute('cx')).toBe('75');
     expect(chart.querySelectorAll('circle')[1].getAttribute('cx')).toBe('387.5');
     expect(chart.querySelectorAll('circle')[2].getAttribute('cx')).toBe('700');
+    expect(chart.querySelectorAll('circle')[0].getAttribute('cy')).toBe('245');
+    expect(chart.querySelectorAll('circle')[5].getAttribute('cy')).toBe('40');
     expect(document.querySelector('table')).not.toBeNull();
+});
+
+test('uses a linear value axis when a series contains zero', () => {
+    document.body.innerHTML = `<h4 id="test-chart">Benchmark</h4>
+        <table><thead><tr><th>Vectors</th><th>Value</th></tr></thead>
+        <tbody><tr><td>10</td><td>0</td></tr><tr><td>100</td><td>10</td></tr></tbody></table>`;
+    renderBenchmarkChart('test-chart');
+    const chart = document.querySelector('.benchmark-chart');
+    expect(chart.textContent).not.toContain('Values (log scale)');
+    expect(Array.from(chart.querySelectorAll('circle')).map(point => point.getAttribute('cy')))
+        .toEqual(['245', '40']);
 });
 
 test('leaves invalid or missing benchmark tables alone', () => {
